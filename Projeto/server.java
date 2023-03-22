@@ -1,3 +1,6 @@
+import RMIClient.Hello_C_I;
+import RMIClient.Hello_S_I;
+
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
@@ -30,7 +33,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I {
 
     // =======================================================
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         String a;
 
         /*
