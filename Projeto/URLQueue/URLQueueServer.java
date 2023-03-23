@@ -1,10 +1,12 @@
 package URLQueue;
 
+import java.io.Serial;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class URLQueueServer extends UnicastRemoteObject implements QueueInterface{
     private final URLQueue queue;
+    private static final long serialVersionUID = 1L;
 
     public URLQueue getQueue() {
         return queue;

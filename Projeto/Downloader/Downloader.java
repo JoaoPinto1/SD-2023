@@ -48,8 +48,10 @@ public class Downloader extends Thread{
             // create socket without binding it (only for sending)
 
             while (true) {
-                URLQueueServer server = (URLQueueServer) LocateRegistry.getRegistry(7000).lookup("Queue");
+                QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(7000).lookup("Queue");
+                System.out.println("Boas");
                 URLObject url = server.removeFromQueue();
+                System.out.println(url.getUrl());
                 String message = url.getUrl();
                 byte[] buffer = message.getBytes();
 

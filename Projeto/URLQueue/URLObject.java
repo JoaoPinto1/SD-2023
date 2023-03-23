@@ -1,6 +1,8 @@
 package URLQueue;
 
-public class URLObject {
+import java.io.Serializable;
+
+public class URLObject implements Serializable {
     private String url;
 
     public URLObject(String url) {
