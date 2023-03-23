@@ -211,6 +211,12 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                 System.out.println("Para realizar logout necessita primeiro realizar login.\n");
                             break;
                         case(4):
+                            System.out.println("Qual o URL que deseja anexar?");
+
+                            String URL = read_text();
+
+                            String msg = "type | url; url | " + URL;
+                            h.print_on_server(msg, (Hello_C_I) c);
                             break;
                         case(5):
                             h.print_on_server("type | search;" , (Hello_C_I) c);

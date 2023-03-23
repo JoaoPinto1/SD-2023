@@ -5,6 +5,7 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.*;
+import URLQueue.*;
 
 
 public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
@@ -72,7 +73,6 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
             }catch(Exception re){
                 System.out.println("Error");
 
-            System.out.println("search");
             }
         }
         else if(received_string[2].equals("regist;")){
@@ -91,6 +91,18 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
             String a = "type | status; logged | off; msg | Logout realizado com sucesso!";
             c.print_on_client(a);
+
+        }
+        //"type | url; url | " + URL;
+        else if(received_string[2].equals("url;")){
+
+            URLObject url = new URLObject(received_string[5]);
+            try {
+                QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
+                server.addToQueue(url);
+            }catch(Exception re){
+                System.out.println("Error");
+            }
 
         }
     }
