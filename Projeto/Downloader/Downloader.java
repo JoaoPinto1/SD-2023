@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-import URLQueue.Interface.Callback;
+//import URLQueue.Interface.Callback;
 
 import java.net.MulticastSocket;
 import java.net.DatagramPacket;
@@ -47,7 +47,7 @@ public class Downloader extends Thread{
 
             while (true) {
                 URLQueue queue = (URLQueue) Naming.lookup("Queue");
-                queue.getNextItem(new CallbackImpl());
+                //queue.getNextItem(new CallbackImpl());
                 String message = this.getName() + " packet ";
                 byte[] buffer = message.getBytes();
 
@@ -62,10 +62,11 @@ public class Downloader extends Thread{
             throw new RuntimeException(e);
         }
     }
-
+    /*
     static class CallbackImpl implements Callback {
         public void onNewItem(String item) throws RemoteException {
             System.out.println("New item: " + item);
         }
     }
+    */
 }
