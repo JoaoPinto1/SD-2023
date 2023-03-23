@@ -3,17 +3,19 @@ package URLQueue;
 import java.rmi.RemoteException;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
-public class URLQueueMain{
-
+public class URLQueueMain {
     public static void main(String[] args) throws RemoteException {
-        URLQueue queue = new URLQueue(100);
         URLObject url = new URLObject("https://www.worten.pt/");
         try {
-            LocateRegistry.createRegistry(7000);
-            Naming.rebind("Queue", queue);
+            Registry r = LocateRegistry.createRegistry(7000);
+            URLQueueServer server = new URLQueueServer();
+            r.rebind("Queue", server);
             System.out.println("Queue server ready.");
-            queue.insert_queue(url);
+            server.addToQueue(url);
+            System.out.println("Adicionei alguma coisa");
         }
         catch (Exception e){
             e.printStackTrace();

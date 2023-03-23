@@ -10,4 +10,6 @@ public class URLObject {
     public String getUrl() {
         return url;
     }
+
+
 }

@@ -24,6 +24,7 @@ public class StorageBarrel extends Thread{
             while (true) {
                 byte[] buffer = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                System.out.println("Waiting");
                 socket.receive(packet);
 
                 System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
