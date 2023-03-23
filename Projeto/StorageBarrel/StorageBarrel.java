@@ -22,7 +22,7 @@ public class StorageBarrel extends Thread{
             NetworkInterface netIf = NetworkInterface.getByName("bge0");
             socket.joinGroup(group, netIf);
             while (true) {
-                byte[] buffer = new byte[256];
+                byte[] buffer = new byte[5000];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 System.out.println("Waiting");
                 socket.receive(packet);

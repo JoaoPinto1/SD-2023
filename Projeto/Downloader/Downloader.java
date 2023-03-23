@@ -30,34 +30,46 @@ public class Downloader extends Thread{
     public static void main(String[] args) throws Exception{
         Downloader server = new Downloader();
         server.start();
-        /*
-        String url = "https://www.worten.pt/";
-        Document doc = Jsoup.connect(url).get();
-        StringTokenizer tokens = new StringTokenizer(doc.text());
-        int countTokens = 0;
-        while (tokens.hasMoreElements() && countTokens++ < 100)
-            System.out.println(tokens.nextToken().toLowerCase());
-        Elements links = doc.select("a[href]");
-        for (Element link : links)
-            System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
-        */
     }
 
     public void run() {
         try (MulticastSocket socket = new MulticastSocket()) {
             // create socket without binding it (only for sending)
-
+            QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
             while (true) {
-                QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(7000).lookup("Queue");
-                System.out.println("Boas");
+
                 URLObject url = server.removeFromQueue();
-                System.out.println(url.getUrl());
-                String message = url.getUrl();
+
+                Document doc = Jsoup.connect(url.getUrl()).get();
+                StringTokenizer tokens = new StringTokenizer(doc.text());
+                int countTokens = 0;
+                String stringWords = "type|word_list;url|"+url.getUrl()+"|";
+                while (tokens.hasMoreElements() && countTokens++ < 100) {
+                    stringWords += "word_" + countTokens + "|" + (tokens.nextToken().toLowerCase()) + ";";
+                    System.out.println(tokens.nextToken().toLowerCase());
+                }
+                int countUrls = 1;
+                String stringUrls = "type|url_list;url_0|"+url.getUrl()+"|";
+                Elements links = doc.select("a[href]");
+                for (Element link : links) {
+                    stringUrls += "url_" + countUrls + "|" + link.attr("abs:href") +";";
+                    countUrls += 1;
+                }
+
+                String message = stringWords;
                 byte[] buffer = message.getBytes();
 
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                 socket.send(packet);
+                /*
+                message = stringUrls;
+                buffer = message.getBytes();
+
+                packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                socket.send(packet);
+
+                 */
             }
         } catch (Exception e) {
             e.printStackTrace();
