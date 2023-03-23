@@ -39,7 +39,7 @@ public class Downloader extends Thread{
             while (true) {
 
                 URLObject url = server.removeFromQueue();
-
+                System.out.println(url.getUrl());
                 Document doc = Jsoup.connect(url.getUrl()).get();
                 StringTokenizer tokens = new StringTokenizer(doc.text());
                 int countTokens = 0;
@@ -62,14 +62,14 @@ public class Downloader extends Thread{
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                 socket.send(packet);
-                /*
+
                 message = stringUrls;
                 buffer = message.getBytes();
 
                 packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                 socket.send(packet);
 
-                 */
+
             }
         } catch (Exception e) {
             e.printStackTrace();

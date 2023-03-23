@@ -31,7 +31,7 @@ public class Storage_Barrels extends UnicastRemoteObject implements Hello_C_I {
      * Inicia conexao com servidor e pergunta ao cliente o que ele deseja fazer, realiza diferentes operacoes tendo em conta a escolha do cliente
      * @param args
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         try{
 
