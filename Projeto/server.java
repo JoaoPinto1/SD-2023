@@ -64,8 +64,16 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
             
         }
         else if(received_string[2].equals("search;")){
-            System.out.println("search");
 
+            try{
+                Hello_S_I server = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
+                server.subscribe("Search Module", (Hello_C_I) h); 
+                server.print_on_server("search" , (Hello_C_I) h);
+            }catch(Exception re){
+                System.out.println("Error");
+
+            System.out.println("search");
+            }
         }
         else if(received_string[2].equals("regist;")){
             if(registed_users.containsKey(received_string[5].replace(";", "")))
