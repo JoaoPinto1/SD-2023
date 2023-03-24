@@ -14,8 +14,6 @@ public class URLQueueMain {
             URLQueueServer server = new URLQueueServer();
             r.rebind("Queue", server);
             System.out.println("Queue server ready.");
-            server.addToQueue(url);
-            System.out.println("Adicionei alguma coisa");
         }
         catch (Exception e){
             e.printStackTrace();
