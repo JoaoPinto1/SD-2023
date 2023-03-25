@@ -8,7 +8,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class URLQueueMain {
     public static void main(String[] args) throws RemoteException {
-        URLObject url = new URLObject("https://www.worten.pt/");
         try {
             Registry r = LocateRegistry.createRegistry(6000);
             URLQueueServer server = new URLQueueServer();

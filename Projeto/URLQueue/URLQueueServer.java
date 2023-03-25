@@ -14,7 +14,7 @@ public class URLQueueServer extends UnicastRemoteObject implements QueueInterfac
 
     public URLQueueServer() throws RemoteException{
         super();
-        queue = new URLQueue(2000);
+        queue = new URLQueue();
     }
 
     public synchronized void addToQueue(URLObject url) throws RemoteException {
@@ -27,7 +27,7 @@ public class URLQueueServer extends UnicastRemoteObject implements QueueInterfac
         notifyAll();
     }
     public synchronized URLObject removeFromQueue() throws RemoteException, InterruptedException {
-        while (queue.empty) {
+        while (queue.isEmpty()) {
             wait();
         }
         URLObject url = new URLObject("");
@@ -41,6 +41,6 @@ public class URLQueueServer extends UnicastRemoteObject implements QueueInterfac
     }
 
     public synchronized boolean isQueueEmpty() throws RemoteException {
-        return queue.empty;
+        return queue.isEmpty();
     }
 }
