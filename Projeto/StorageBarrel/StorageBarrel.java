@@ -82,6 +82,7 @@ public class StorageBarrel extends Thread {
                         HashMap<String, HashSet<String>> new_index = (HashMap<String, HashSet<String>>) inUrls.readObject();
                         System.out.println(new_index);
                     }
+
                 }
             }
         } catch (IOException | ClassNotFoundException e) {

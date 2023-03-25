@@ -14,7 +14,7 @@ public class URLQueueServer extends UnicastRemoteObject implements QueueInterfac
 
     public URLQueueServer() throws RemoteException{
         super();
-        queue = new URLQueue(100);
+        queue = new URLQueue(2000);
     }
 
     public synchronized void addToQueue(URLObject url) throws RemoteException {
