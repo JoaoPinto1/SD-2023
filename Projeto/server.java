@@ -5,6 +5,9 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.*;
+
+import RMIClient.Hello_C_I;
+import RMIClient.Hello_S_I;
 import URLQueue.*;
 
 
@@ -29,32 +32,29 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
         //type | login; username | andre; password | moreira
         if(received_string[2].equals("login;")){
-            
-            if(registed_users.containsKey(received_string[5].replace(";", "")))
-            {
+            synchronized (registed_users) {
+                if (registed_users.containsKey(received_string[5].replace(";", ""))) {
 
-            String a = "type | status; logged | on; msg | Login realizado com sucesso!";
+                    String a = "type | status; logged | on; msg | Login realizado com sucesso!";
 
-            String user_password = registed_users.get(received_string[5].replace(";", ""));
+                    String user_password = registed_users.get(received_string[5].replace(";", ""));
 
-            if(user_password.equals(received_string[8]))
-            {
-                c.print_on_client(a);
+                    if (user_password.equals(received_string[8])) {
+                        c.print_on_client(a);
 
-                //fazer login ao user
-                String username = received_string[5].replace(";", "");
-                String password = received_string[8];
-                System.out.println("username: " + username + "\npassword: " + password + "\n");
-            }
+                        //fazer login ao user
+                        String username = received_string[5].replace(";", "");
+                        String password = received_string[8];
+                        System.out.println("username: " + username + "\npassword: " + password + "\n");
+                    } else {
+                        a = "type | status; register | failed; msg | Username ou password errados.";
+                        c.print_on_client(a);
+                    }
 
-            else{
-                a = "type | status; register | failed; msg | Username ou password errados.";
-                c.print_on_client(a);
-            }
-            }
-            else{
-                String a = "type | status; register | failed; msg | Username ou password errados.";
-                c.print_on_client(a);
+                } else {
+                    String a = "type | status; register | failed; msg | Username ou password errados.";
+                    c.print_on_client(a);
+                }
             }
 
         }
@@ -62,13 +62,13 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
         }
         else if(received_string[2].equals("url_list;")){
-            
+
         }
         else if(received_string[2].equals("search;")){
 
             try{
                 Hello_S_I server = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
-                server.subscribe("Search Module", (Hello_C_I) h); 
+                server.subscribe("Search Module", (Hello_C_I) h);
                 server.print_on_server("search" , (Hello_C_I) h);
             }catch(Exception re){
                 System.out.println("Error");
@@ -76,17 +76,18 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
             }
         }
         else if(received_string[2].equals("regist;")){
-            if(registed_users.containsKey(received_string[5].replace(";", "")))
-            {
-                String a = "type | status; register | failed; msg | O username ja se encontra utilizado.";
-                c.print_on_client(a);
+
+            synchronized (registed_users) {
+                if (registed_users.containsKey(received_string[5].replace(";", ""))) {
+                    String a = "type | status; register | failed; msg | O username ja se encontra utilizado.";
+                    c.print_on_client(a);
+                } else {
+                    registed_users.put(received_string[5].replace(";", ""), received_string[8]);
+                    String a = "type | status; register | sucess; msg | Registo concluido com sucesso!";
+                    c.print_on_client(a);
+                }
             }
-            else{
-                registed_users.put(received_string[5].replace(";", ""), received_string[8]);
-                String a = "type | status; register | sucess; msg | Registo concluido com sucesso!";
-                c.print_on_client(a);
-            }
-        }       
+        }
         else if(received_string[2].equals("logout;")){
 
             String a = "type | status; logged | off; msg | Logout realizado com sucesso!";
@@ -103,6 +104,8 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
             }catch(Exception re){
                 System.out.println("Error");
             }
+        }
+        else if(received_string[2].equals("information;")){
 
         }
     }
@@ -110,13 +113,17 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Subscribing " + name);
         System.out.print("> ");
-        clients.add(c);
+        synchronized (clients) {
+            clients.add(c);
+        }
     }
 
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
-        clients.remove(c);
+        synchronized (clients) {
+            clients.remove(c);
+        }
     }
 
     // =======================================================

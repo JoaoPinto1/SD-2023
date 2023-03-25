@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import  java.util.Random;
 import java.util.*;
+import RMIClient.Hello_C_I;
+import RMIClient.Hello_S_I;
 
 
 public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I, Runnable {
@@ -36,17 +38,18 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
             try{
                 Hello_S_I server = (Hello_S_I) LocateRegistry.getRegistry(7000).lookup("XPTO");
                 server.subscribe("Barrels Server", (Hello_C_I) h); 
+                synchronized (clients) {
+                    Random rand = new Random();
+                    int rand_int = rand.nextInt(clients.size() - 1);
 
-                Random rand = new Random();
-                int rand_int = rand.nextInt(clients.size()-1);
+                    System.out.println(clients.size() + " |||| " + rand_int);
 
-                System.out.println(clients.size() + " |||| " + rand_int );
+                    Hello_C_I client = clients.get(rand_int);
+                    client.print_on_client("search_start");
 
-                Hello_C_I client = clients.get(rand_int);
-                client.print_on_client("search_start");
-
-                server.print_on_server("Enviei uma mensagem|" , (Hello_C_I) h);
-                server.unsubscribe("Barrels Server", (Hello_C_I) h);
+                    server.print_on_server("Enviei uma mensagem|", (Hello_C_I) h);
+                    server.unsubscribe("Barrels Server", (Hello_C_I) h);
+                }
             }catch(Exception re){
                 System.out.println("Error");
             }
@@ -60,13 +63,17 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Subscribing " + name);
         System.out.print("> ");
-        clients.add(c);
+        synchronized (clients) {
+            clients.add(c);
+        }
     }
 
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
-        clients.remove(c);
+        synchronized (clients) {
+            clients.remove(c);
+        }
     }
 
     // =======================================================

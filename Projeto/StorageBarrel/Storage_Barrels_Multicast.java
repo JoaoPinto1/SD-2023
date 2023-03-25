@@ -4,21 +4,21 @@ import java.io.*;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
 
 
-public class StorageBarrel extends Thread {
+public class Storage_Barrels_Multicast extends Thread implements Runnable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
 
-    public static void main(String[] args) {
-        StorageBarrel client = new StorageBarrel();
-        client.start();
+    public Storage_Barrels_Multicast() throws RemoteException {
+        super();
     }
 
+    @Override
     public void run() {
         try (MulticastSocket socket = new MulticastSocket(PORT)) {
             // create socket and bind it
