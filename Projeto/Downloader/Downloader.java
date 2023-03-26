@@ -22,6 +22,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
@@ -35,22 +36,39 @@ public class Downloader extends Thread{
     }
 
     public void run() {
-        try (MulticastSocket socket = new MulticastSocket()) {
+        try {
+            ReliableMulticast multicast = new ReliableMulticast(MULTICAST_ADDRESS,PORT);
             // create socket without binding it (only for sending)
             QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
             int seqNum = 0;
             while (true) {
-
                 URLObject url = server.removeFromQueue();
-                System.out.println(url.getUrl());
                 Document doc = Jsoup.connect(url.getUrl()).get();
+                Element firstArticle = doc.select("article").first();
+                Element titleElement = null;
+                if(firstArticle != null) {
+                    titleElement = firstArticle.select("h1 a").first();
+                }
+                String titleText = null;
+                if (titleElement != null) {
+                    titleText = titleElement.text();
+                }
+                url.setTitle(titleText);
+                Element citationElement = doc.select("cite").first();
+                String citationText = null;
+                if(citationElement != null) {
+                    citationText = citationElement.text();
+                }
+                url.setCitation(citationText);
+                String urlString = "type|url;url|"+url.getUrl()+";"+"title|"+url.getTitle()+";"+"citation|"+url.getCitation()+";";
+                multicast.send(urlString,seqNum);
+                seqNum+=1;
                 StringTokenizer tokens = new StringTokenizer(doc.text());
                 int countTokens = 0;
                 String stringWords = "type|word_list;url|"+url.getUrl()+"|";
                 while (tokens.hasMoreElements() && countTokens++ < 100) {
                     String nextToken = tokens.nextToken();
                     stringWords += "word_" + countTokens + "|" + (nextToken.toLowerCase()) + ";";
-                    System.out.println(nextToken.toLowerCase());
                 }
                 int countUrls = 1;
                 String stringUrls = "type|url_list;url_0|"+url.getUrl()+"|";
@@ -61,24 +79,10 @@ public class Downloader extends Thread{
                     server.addToQueue(new_url);
                     countUrls += 1;
                 }
-
-                String message = stringWords;
-                byte[] buffer = message.getBytes();
-
-                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-
-                socket.send(packet);
-
-                HashSet<InetAddress> ackedClients = new HashSet<>();
-
-                message = stringUrls;
-                buffer = message.getBytes();
-
-                packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                socket.send(packet);
-
-
+                multicast.send(stringWords,seqNum);
+                seqNum += 1;
+                multicast.send(stringUrls,seqNum);
+                seqNum += 1;
             }
         } catch (Exception e) {
             e.printStackTrace();
