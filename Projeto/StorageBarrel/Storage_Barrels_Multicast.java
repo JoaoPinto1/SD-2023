@@ -32,14 +32,9 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
 
             Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
             c.setAutoCommit(false);
-            Statement stmt = c.createStatement();
             PreparedStatement pre_stmt;
             ResultSet rs;
             System.out.println("Opened database successfully");
-
-            HashMap<String, HashSet<String>> index = new HashMap<>();
-            HashMap<String, HashSet<String>> urls = new HashMap<>();
-            urls.put("visited", new HashSet<>());
 
             while (true) {
                 byte[] buffer = new byte[5000];
@@ -125,6 +120,5 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
         DatagramPacket ackPacket = new DatagramPacket(ack, ack.length, group, PORT);
         socket.send(ackPacket);
-        System.out.println("enviei");
     }
 }

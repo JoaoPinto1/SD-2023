@@ -1,6 +1,5 @@
 package Downloader;
 
-import URLQueue.URLQueueServer;
 import URLQueue.URLObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,20 +9,7 @@ import org.jsoup.select.Elements;
 
 import URLQueue.QueueInterface;
 
-import java.net.MulticastSocket;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-
-import java.io.IOException;
-import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.StringTokenizer;
 
 public class Downloader extends Thread{
