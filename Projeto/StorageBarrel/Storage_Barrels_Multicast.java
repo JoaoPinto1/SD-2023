@@ -58,7 +58,12 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
                     pre_stmt.setString(1, split_message[3]);
                     rs = pre_stmt.executeQuery();
                     if (rs.next()) {
-                        System.out.println("URL already exists");
+                        pre_stmt = c.prepareStatement("UPDATE url set title=?,citation=? where url=?;");
+                        pre_stmt.setString(1,split_message[5]);
+                        pre_stmt.setString(2,split_message[7]);
+                        pre_stmt.setString(3,split_message[3]);
+                        pre_stmt.executeUpdate();
+                        c.commit();
                     } else {
                         pre_stmt = c.prepareStatement("INSERT INTO url VALUES (?,?,?);");
                         pre_stmt.setString(1, split_message[3]);
@@ -94,10 +99,19 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
 
                     if (split_message[1].equals("url_list")) {
                         for (int i = 5; i < split_message.length; i += 2) {
-
+                            pre_stmt = c.prepareStatement("insert into url values (?,null,null);");
+                            pre_stmt.setString(1,split_message[i]);
+                            pre_stmt.executeUpdate();
+                            c.commit();
+                        }
+                        for (int i = 5; i < split_message.length; i += 2){
+                            pre_stmt = c.prepareStatement("insert into url_url values (?,?);");
+                            pre_stmt.setString(1,split_message[3]);
+                            pre_stmt.setString(2,split_message[i]);
+                            pre_stmt.executeUpdate();
+                            c.commit();
                         }
                     }
-
                 }
             }
         } catch (IOException | SQLException e) {
