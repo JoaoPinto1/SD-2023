@@ -12,9 +12,9 @@ public class ReliableMulticast {
     private final MulticastSocket socket;
 
     public ReliableMulticast(String groupAddress, int groupPort) throws Exception {
+        this.socket = new MulticastSocket(groupPort);
         this.groupAddress = InetAddress.getByName(groupAddress);
         this.groupPort = groupPort;
-        this.socket = new MulticastSocket(groupPort);
     }
 
     public void send(String message, int seqNum) throws Exception{
@@ -32,6 +32,14 @@ public class ReliableMulticast {
         socket.send(packet);
 
         //waitForAck(buffer);
+    }
+
+    public void receive() throws IOException {
+        byte[] buffer = new byte[100];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        socket.receive(packet);
+        String message = new String(packet.getData(), 0, packet.getLength());
+        System.out.println("Recebi: "+message);
     }
 
     private void waitForAck(byte[] message) throws IOException, InterruptedException {
