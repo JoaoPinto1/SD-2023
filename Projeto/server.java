@@ -16,9 +16,11 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
     public ArrayList<Hello_C_I> clients;
     public HashMap<String, String> registed_users = new HashMap<String, String>();
     public server h;
+    public final List<String> results;
 
-    public server() throws RemoteException {
+    public server(List<String> Result) throws RemoteException {
         super();
+        this.results = Result;
         clients = new ArrayList<Hello_C_I>();
     }
 
@@ -29,7 +31,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         System.out.println("> " + s);
 
         String[] received_string = s.split(" ", 0);
-
+        System.out.println(Arrays.toString(received_string));
         //type | login; username | andre; password | moreira
         if(received_string[2].equals("login;")){
             synchronized (registed_users) {
@@ -65,11 +67,22 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
         }
         else if(received_string[2].equals("search;")){
-
             try{
-                Hello_S_I server = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
-                server.subscribe("Search Module", (Hello_C_I) h);
-                server.print_on_server("search" , (Hello_C_I) h);
+                //usar waits
+                synchronized (results){
+
+                    while(results.isEmpty()){
+                        results.notify();
+                        System.out.println("o que vou mandar:" + s);
+                        results.add(s);
+                        results.wait();
+
+                    }
+                    String resultados = results.get(0);
+                    c.print_on_client("type | status; search | result; " + resultados);
+                    results.remove(0);
+                }
+
             }catch(Exception re){
                 System.out.println("Error");
 
@@ -77,15 +90,13 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         }
         else if(received_string[2].equals("regist;")){
 
-            synchronized (registed_users) {
-                if (registed_users.containsKey(received_string[5].replace(";", ""))) {
-                    String a = "type | status; register | failed; msg | O username ja se encontra utilizado.";
-                    c.print_on_client(a);
-                } else {
-                    registed_users.put(received_string[5].replace(";", ""), received_string[8]);
-                    String a = "type | status; register | sucess; msg | Registo concluido com sucesso!";
-                    c.print_on_client(a);
-                }
+            if (registed_users.containsKey(received_string[5].replace(";", ""))) {
+                String a = "type | status; register | failed; msg | O username ja se encontra utilizado.";
+                c.print_on_client(a);
+            } else {
+                registed_users.put(received_string[5].replace(";", ""), received_string[8]);
+                String a = "type | status; register | sucess; msg | Registo concluido com sucesso!";
+                c.print_on_client(a);
             }
         }
         else if(received_string[2].equals("logout;")){
@@ -108,22 +119,19 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         else if(received_string[2].equals("information;")){
 
         }
+
     }
 
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Subscribing " + name);
         System.out.print("> ");
-        synchronized (clients) {
-            clients.add(c);
-        }
+        clients.add(c);
     }
 
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
-        synchronized (clients) {
-            clients.remove(c);
-        }
+        clients.remove(c);
     }
 
     // =======================================================
@@ -132,7 +140,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         String a;
 
         try (Scanner sc = new Scanner(System.in)) {
-            h = new server();
+            h = new server(results);
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("XPTO", h);
 

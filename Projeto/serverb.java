@@ -3,7 +3,6 @@ import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Scanner;
 import  java.util.Random;
 import java.util.*;
 import RMIClient.Hello_C_I;
@@ -12,14 +11,15 @@ import RMIClient.Hello_S_I;
 
 public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I, Runnable {
 
-    public ArrayList<Hello_C_I> clients;
+    public final ArrayList<Hello_C_I> clients_RMI;
     public HashMap<String, String> registed_users = new HashMap<String, String>();
     public serverb h;
+    public final List<String> results;
 
-
-    public serverb() throws RemoteException {
+    public serverb(List<String> Result) throws RemoteException {
         super();
-        clients = new ArrayList<Hello_C_I>();
+        this.results = Result;
+        clients_RMI = new ArrayList<Hello_C_I>();
     }
 
     public void print_on_client(String s) throws RemoteException{
@@ -28,80 +28,92 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     public void print_on_server(String s , Hello_C_I c) throws RemoteException {
 
-        System.out.println("> " + s);
-
-        /**
-         * Inicia conexao entre search module e storage barrel
-         */
-        if(s.equals("search")){
-
-            try{
-                Hello_S_I server = (Hello_S_I) LocateRegistry.getRegistry(7000).lookup("XPTO");
-                server.subscribe("Barrels Server", (Hello_C_I) h); 
-                synchronized (clients) {
-                    Random rand = new Random();
-                    int rand_int = rand.nextInt(clients.size() - 1);
-
-                    System.out.println(clients.size() + " |||| " + rand_int);
-
-                    Hello_C_I client = clients.get(rand_int);
-                    client.print_on_client("search_start");
-
-                    server.print_on_server("Enviei uma mensagem|", (Hello_C_I) h);
-                    server.unsubscribe("Barrels Server", (Hello_C_I) h);
-                }
-            }catch(Exception re){
-                System.out.println("Error");
-            }
-
+        synchronized (results) {
+            results.add(s);
+            results.notify();
         }
 
-
     }
-    
 
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Subscribing " + name);
         System.out.print("> ");
-        synchronized (clients) {
-            clients.add(c);
+        synchronized (clients_RMI) {
+            clients_RMI.add(c);
+            System.out.println("Cliente adicionado , " + clients_RMI.size());
         }
     }
 
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
-        synchronized (clients) {
-            clients.remove(c);
+        synchronized (clients_RMI) {
+            clients_RMI.remove(c);
         }
     }
+    private Hello_C_I RandomClient() {
+        synchronized (h.clients_RMI) {
+
+            if (h.clients_RMI.isEmpty()) {
+                return null;
+            }
+            System.out.println(h.clients_RMI.size());
+            Random rand = new Random();
+            int rand_int = rand.nextInt(h.clients_RMI.size());
+            return h.clients_RMI.get(rand_int);
+        }
+    }
+
+
 
     // =======================================================
     @Override
     public void run() {
         String a;
 
-        try (Scanner sc = new Scanner(System.in)) {
+        try {
 
-            h = new serverb();
+            h = new serverb(results);
 
             Registry r = LocateRegistry.createRegistry(7001);
             r.rebind("XPT", h);
-               
+
             System.out.println("Hello Barrel_Server ready.");
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+        while (true) {
 
-            while (true) {
+            synchronized (results) {
+                while (results.isEmpty()) {
+                    try {
+                        results.wait();
 
-                System.out.print(">");
-                a = sc.nextLine();
-
-                for (Hello_C_I client : h.clients) {
-                    client.print_on_client(a);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                
             }
-        } catch (Exception re) {
-            System.out.println("Exception in HelloImpl.main: " + re);
-        } 
+
+            Hello_C_I client = RandomClient();
+
+            if(client != null) {
+                try {
+                    System.out.println("a lista no momento:" + results);
+                    String str_received = results.get(0);
+                    results.remove(0);
+                    System.out.println(str_received);
+
+                    String[] str = str_received.split(" ");
+                    System.out.println(Arrays.toString(str));
+                    client.print_on_client(str[5]);
+
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        }
+
     }
 }

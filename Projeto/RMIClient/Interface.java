@@ -3,12 +3,9 @@ package RMIClient;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.util.Arrays;
 import java.util.Scanner;
-import java.net.*;
-import RMIClient.Hello_C_I;
-import RMIClient.Hello_S_I;
-import java.io.*;
+
 
 public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
@@ -26,14 +23,9 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
         //"type | status; logged | on; msg | Welcome to the app"
         String[] msg_received = s.split(" " , 0);
 
-        //podemos meter variavel para depois verificar se estamos logados ou nao
-        //tendo em conta a mensagem recevida podemos ver se e um login ou um logout.
         if(msg_received[3].equals("logged")){
 
-            if(msg_received[5].equals("on;"))
-                logged_in = true;
-            else
-                logged_in = false;
+            logged_in = msg_received[5].equals("on;");
 
             if(msg_received.length > 6)
             {
@@ -56,15 +48,42 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 System.out.println("\n");
             }
         }
+        //type | status; search | result; " + received_string[5]
+        else if(msg_received[3].equals("search")){
+            String search_results = msg_received[6];
+            String[] separate_results = search_results.split(";");
+
+            int counter = 0;
+
+            for(int i = 0 ; i < separate_results.length ; i += 3){
+
+                counter ++;
+                System.out.println(separate_results[i] + "\n" + separate_results[i+ 1] + "\n" + separate_results[i+2] + "\n");
+
+                if(counter == 10){
+                    System.out.println("Deseja ir para a proxima pagina?\n");
+                    System.out.println("1 - sim\n2 - nao");
+                    int escolha = read_int();
+
+                    if(escolha != 1)
+                    {
+                        break;
+                    }
+                    else
+                        counter = 0;
+                }
+            }
+
+        }
     }
     /**
      * Le inteiro inserido na consola
-     * @return
+     *
      */
     private static int read_int(){
 
         int n;
-        System.out.printf("Digite o numero:");
+        System.out.print("Digite o numero:");
         try{
 
             Scanner sc = new Scanner(System.in);
@@ -80,7 +99,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     }
     /**
      * Le texto inserido na consola
-     * @return
+     *
      */
     private static String read_text(){
 
@@ -94,7 +113,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
         }
         //Se o valor for um valor causar um erro, ira ser avisado ao usuario que o valor nao e valido.
         catch (java.util.InputMismatchException e){
-            System.out.printf("Valor Introduzido nao e valido.");
+            System.out.print("Valor Introduzido nao e valido.");
             return null;
         }
 
@@ -103,22 +122,19 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
     private static Boolean verify_value(String username)
     {
-        if (username.contains("|") || username.contains(";") || username.contains("\\n"))
-            return false;
-        else
-            return true;
+        return !username.contains("|") && !username.contains(";") && !username.contains("\\n");
 
     }
 
     /**
      * Inicia conexao com servidor e pergunta ao cliente o que ele deseja fazer, realiza diferentes operacoes tendo em conta a escolha do cliente
-     * @param args
+     *
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         try{
 
-            Boolean finish = false;
+            boolean finish = false;
             Hello_S_I h = (Hello_S_I) LocateRegistry.getRegistry(7000).lookup("XPTO");
 
             Interface c = new Interface();
@@ -133,9 +149,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                 if(num != -1){
 
-                    int choice = num;
-
-                    switch(choice)
+                    switch(num)
                     {
                         case(1):
 
@@ -223,15 +237,30 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                             h.print_on_server(msg, (Hello_C_I) c);
                             break;
                         case(5):
-                            System.out.println("O que deseja pesquisar?");
-                            String pesquisa = read_text();
+                            System.out.println("Quantos termos deseja pesquisar?");
+                            int termos = read_int();
 
-                            if(pesquisa == null) {
-                                System.out.println("Erro na pesquisa!");
-                                break;
+                            if(termos == -1){
+                                System.out.println("Erro nos termos!");
+                            }
+                            String[] pesquisa = new String[termos];
+
+                            for(int i = 0 ; i < termos ; i++){
+
+                                pesquisa[i] = read_text();
+                                pesquisa[i] = pesquisa[i];
+
+                                if(pesquisa[i] == null) {
+                                    System.out.println("Erro na pesquisa!");
+                                    break;
+                                }
                             }
 
-                            h.print_on_server("type | search; pesquisa | " + pesquisa , (Hello_C_I) c);
+                            String str = String.join(",", pesquisa);
+
+                            System.out.println(str);
+
+                            h.print_on_server("type | search; pesquisa | " + str , (Hello_C_I) c);
 
                             break;
                         case(6):
@@ -244,7 +273,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                     }
                 }
 
-                if(finish == true){
+                if(finish){
                     System.exit(0);
                 }
             }

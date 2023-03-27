@@ -4,6 +4,8 @@ import RMIClient.Hello_C_I;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
+import java.sql.*;
+import java.util.*;
 
 public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_I,Runnable {
 
@@ -19,9 +21,84 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
      */
     public void print_on_client(String s) throws RemoteException {
 
-        //"start_search"
-        System.out.println("recebi o pedido.");
-        h.print_on_server("Esta aqui a mensagem pedida.", c);
+        String[] pesquisa = s.split(",");
+        System.out.println(Arrays.toString(pesquisa));
+        //todos os URLS em que aparece o primeiro termo.
+        ArrayList<String> rowValuesFinal = new ArrayList<String>();
+        ArrayList<String> resultList = new ArrayList<String>();
+
+        try {
+
+            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
+            con.setAutoCommit(false);
+            PreparedStatement pre_stmt;
+            ResultSet rs;
+            pre_stmt = con.prepareStatement("SELECT url_url from word_url where word_word=?;");
+            pre_stmt.setString(1, pesquisa[0]);
+            ResultSet URLS = pre_stmt.executeQuery();
+
+            while (true){
+                try {
+                    if (!URLS.next()) break;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    rowValuesFinal.add(URLS.getString(1));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        if(!rowValuesFinal.isEmpty()) {
+            ArrayList<String> rowValues = new ArrayList<String>();
+            for (int i = 1; i < pesquisa.length; i++) {
+                try {
+                    pre_stmt = con.prepareStatement("SELECT url_url from word_url where word_word=?;");
+                    pre_stmt.setString((1), pesquisa[i]);
+                    ResultSet Url = pre_stmt.executeQuery();
+                    while (true){
+                        try {
+                            if (!Url.next()) break;
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            rowValues.add(Url.getString(1));
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                rowValuesFinal.retainAll(rowValues);
+
+            }
+        }
+
+        for(int i = 0; i < rowValuesFinal.size(); i++) {
+
+            pre_stmt = con.prepareStatement("SELECT url.url,title,citation from url where url.url=?;");
+            pre_stmt.setString((1), rowValuesFinal.get(i));
+            ResultSet Url = pre_stmt.executeQuery();
+
+            while (Url.next()) {
+                String url_obtained = Url.getString("url");
+                String title = Url.getString("title");
+                String citation = Url.getString("citation");
+                String resultRow = "url:" + url_obtained +";title:" + title + ";citation:" + citation;
+                resultList.add(resultRow);
+            }
+        }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        String str = String.join(";", resultList);
+        System.out.println(str);
+        h.print_on_server(str, c);
 
     }
 

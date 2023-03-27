@@ -1,17 +1,15 @@
-import java.io.Serializable;
-import java.rmi.registry.LocateRegistry;
-import java.util.*;
-import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import java.rmi.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class search_module extends UnicastRemoteObject implements Search_Module_Remote{
 
     private Thread t1,t2;
     private server sc;
-    private serverb sb;   
-    
+    private serverb sb;
+    public List <String> results;
     /**
      * Inicia os dois server necessarios, o que espera do search module e o dos barrels.
      * @throws RemoteException
@@ -19,9 +17,10 @@ public class search_module extends UnicastRemoteObject implements Search_Module_
     public search_module() throws RemoteException{
 
         super();
-        sb = new serverb();
+        results = new ArrayList<String>();
+        sb = new serverb(results);
         t1 = new Thread(sb);
-        sc = new server();
+        sc = new server(results);
         t2 = new Thread(sc);
         t1.start();
         t2.start();
