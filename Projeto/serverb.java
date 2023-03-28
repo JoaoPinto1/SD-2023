@@ -28,6 +28,8 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     public void print_on_server(String s , Hello_C_I c) throws RemoteException {
 
+        System.out.println("serverb " + s);
+
         synchronized (results) {
             results.add(s);
             results.notify();
@@ -57,6 +59,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
             if (h.clients_RMI.isEmpty()) {
                 return null;
             }
+
             System.out.println(h.clients_RMI.size());
             Random rand = new Random();
             int rand_int = rand.nextInt(h.clients_RMI.size());
@@ -82,6 +85,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
+
         while (true) {
 
             synchronized (results) {
@@ -106,7 +110,9 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
                     String[] str = str_received.split(" ");
                     System.out.println(Arrays.toString(str));
-                    client.print_on_client(str[5]);
+                    String new_string = str[2] + "," + str[5];
+                    System.out.println(new_string);
+                    client.print_on_client(new_string);
 
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);

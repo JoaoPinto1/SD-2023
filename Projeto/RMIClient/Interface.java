@@ -49,31 +49,65 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
             }
         }
         //type | status; search | result; " + received_string[5]
-        else if(msg_received[3].equals("search")){
+        else if(msg_received[3].equals("search")) {
+
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
 
-            int counter = 0;
+            if (separate_results[0].equals("nada"))
+                System.out.println("Nao foi encontrado nada!");
 
-            for(int i = 0 ; i < separate_results.length ; i += 3){
+            else {
+                int counter = 0;
 
-                counter ++;
-                System.out.println(separate_results[i] + "\n" + separate_results[i+ 1] + "\n" + separate_results[i+2] + "\n");
+                for (int i = 0; i < separate_results.length; i += 3) {
 
-                if(counter == 10){
-                    System.out.println("Deseja ir para a proxima pagina?\n");
-                    System.out.println("1 - sim\n2 - nao");
-                    int escolha = read_int();
+                    counter++;
+                    System.out.println(separate_results[i] + "\n" + separate_results[i + 1] + "\n" + separate_results[i + 2] + "\n");
 
-                    if(escolha != 1)
-                    {
-                        break;
+                    if (counter == 10) {
+                        System.out.println("Deseja ir para a proxima pagina?\n");
+                        System.out.println("1 - sim\n2 - nao");
+                        int escolha = read_int();
+
+                        if (escolha != 1) {
+                            break;
+                        } else
+                            counter = 0;
                     }
-                    else
-                        counter = 0;
                 }
-            }
 
+            }
+        }
+        else if(msg_received[3].equals("search1")) {
+
+            String search_results = msg_received[6];
+            String[] separate_results = search_results.split(";");
+
+            if (separate_results[0].equals("nada"))
+                System.out.println("Nao foi encontrado nada!");
+
+            else {
+                int counter = 0;
+
+                for (int i = 0; i < separate_results.length; i++) {
+
+                    counter++;
+                    System.out.println(separate_results[i] + "\n");
+
+                    if (counter == 10) {
+                        System.out.println("Deseja ir para a proxima pagina?\n");
+                        System.out.println("1 - sim\n2 - nao");
+                        int escolha = read_int();
+
+                        if (escolha != 1) {
+                            break;
+                        } else
+                            counter = 0;
+                    }
+                }
+
+            }
         }
     }
     /**
@@ -143,7 +177,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
             while(true)
             {
-                System.out.println("O que deseja realizar?\n\n1 - Login\n2 - Registar\n3 - Logout\n4 - Indexar novo URL\n5 - Realizar pesquisa\n6 - Consultar informacoes gerais do sistema\n7 - Sair do programa\n");
+                System.out.println("O que deseja realizar?\n\n1 - Login\n2 - Registar\n3 - Logout\n4 - Indexar novo URL\n5 - Realizar pesquisa de termos\n6 - Realizar pesquisa de urls\n7 - Consultar informacoes gerais do sistema\n8 - Sair do programa\n");
 
                 int num = read_int();
 
@@ -240,13 +274,13 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                             System.out.println("Quantos termos deseja pesquisar?");
                             int termos = read_int();
 
-                            if(termos == -1){
+                            if(termos < 1){
                                 System.out.println("Erro nos termos!");
                             }
                             String[] pesquisa = new String[termos];
 
                             for(int i = 0 ; i < termos ; i++){
-
+                                System.out.println("Insira o termo " + (i+1) + ":");
                                 pesquisa[i] = read_text();
                                 pesquisa[i] = pesquisa[i];
 
@@ -264,9 +298,21 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                             break;
                         case(6):
-                            h.print_on_server("type | information;" , (Hello_C_I) c);
+                            System.out.println("Que URL deseja pesquisar?");
+                            String url = read_text();
+
+                            if(url == null){
+                                System.out.println("url invalido!\n");
+                                break;
+                            }
+
+                            System.out.println(url);
+                            h.print_on_server("type | search1; pesquisa | " + url , (Hello_C_I) c);
                             break;
                         case(7):
+                            h.print_on_server("type | information;" , (Hello_C_I) c);
+                            break;
+                        case(8):
                             h.unsubscribe("cliente", (Hello_C_I) c);
                             finish = true;
                             break;

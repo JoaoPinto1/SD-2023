@@ -88,6 +88,28 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
             }
         }
+        else if(received_string[2].equals("search1;")){
+            try{
+                //usar waits
+                synchronized (results){
+
+                    while(results.isEmpty()){
+                        results.notify();
+                        System.out.println("o que vou mandar:" + s);
+                        results.add(s);
+                        results.wait();
+
+                    }
+                    String resultados = results.get(0);
+                    c.print_on_client("type | status; search1 | result; " + resultados);
+                    results.remove(0);
+                }
+
+            }catch(Exception re){
+                System.out.println("Error");
+
+            }
+        }
         else if(received_string[2].equals("regist;")){
 
             if (registed_users.containsKey(received_string[5].replace(";", ""))) {

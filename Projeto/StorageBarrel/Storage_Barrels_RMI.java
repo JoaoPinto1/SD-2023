@@ -21,84 +21,139 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
      */
     public void print_on_client(String s) throws RemoteException {
 
+        //tipo de search
+
         String[] pesquisa = s.split(",");
         System.out.println(Arrays.toString(pesquisa));
         //todos os URLS em que aparece o primeiro termo.
         ArrayList<String> rowValuesFinal = new ArrayList<String>();
         ArrayList<String> resultList = new ArrayList<String>();
 
-        try {
+        if(pesquisa[0].equals("search;")) {
+            try {
+                Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
+                con.setAutoCommit(false);
+                PreparedStatement pre_stmt;
+                ResultSet rs;
+                pre_stmt = con.prepareStatement("""
+                        SELECT u.url, COUNT(uu.url_url) AS count
+                        FROM word_url wu
+                        JOIN url u ON wu.url_url = u.url
+                        LEFT JOIN url_url uu ON u.url = uu.url_url1
+                        WHERE wu.word_word = ?
+                        GROUP BY u.url
+                        ORDER BY count DESC;""");
+                pre_stmt.setString(1, pesquisa[1]);
+                ResultSet URLS = pre_stmt.executeQuery();
 
-            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
-            con.setAutoCommit(false);
-            PreparedStatement pre_stmt;
-            ResultSet rs;
-            pre_stmt = con.prepareStatement("SELECT url_url from word_url where word_word=?;");
-            pre_stmt.setString(1, pesquisa[0]);
-            ResultSet URLS = pre_stmt.executeQuery();
-
-            while (true){
-                try {
-                    if (!URLS.next()) break;
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    rowValuesFinal.add(URLS.getString(1));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        if(!rowValuesFinal.isEmpty()) {
-            ArrayList<String> rowValues = new ArrayList<String>();
-            for (int i = 1; i < pesquisa.length; i++) {
-                try {
-                    pre_stmt = con.prepareStatement("SELECT url_url from word_url where word_word=?;");
-                    pre_stmt.setString((1), pesquisa[i]);
-                    ResultSet Url = pre_stmt.executeQuery();
-                    while (true){
-                        try {
-                            if (!Url.next()) break;
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
-                        try {
-                            rowValues.add(Url.getString(1));
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
+                while (true) {
+                    try {
+                        if (!URLS.next())
+                            break;
+                        rowValuesFinal.add(URLS.getString(1));
+                    } catch (SQLException e) {
+                        System.out.println("Erro no storage Barrel!");
+                        throw new RuntimeException(e);
                     }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
                 }
-                rowValuesFinal.retainAll(rowValues);
+
+                if (!rowValuesFinal.isEmpty()) {
+                    ArrayList<String> rowValues = new ArrayList<String>();
+                    for (int i = 2; i < pesquisa.length; i++) {
+                        try {
+                            pre_stmt = con.prepareStatement("""
+                                    SELECT u.url, COUNT(uu.url_url) AS count
+                                    FROM word_url wu
+                                    JOIN url u ON wu.url_url = u.url
+                                    LEFT JOIN url_url uu ON u.url = uu.url_url1
+                                    WHERE wu.word_word = ?
+                                    GROUP BY u.url
+                                    ORDER BY count DESC;""");
+                            pre_stmt.setString((1), pesquisa[i]);
+                            ResultSet Url = pre_stmt.executeQuery();
+                            while (true) {
+                                try {
+                                    if (!Url.next())
+                                        break;
+                                    rowValues.add(Url.getString(1));
+                                } catch (SQLException e) {
+                                    System.out.println("Erro no storage Barrel!");
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        } catch (SQLException e) {
+                            System.out.println("Erro no storage Barrel!");
+                            throw new RuntimeException(e);
+                        }
+                        rowValuesFinal.retainAll(rowValues);
+
+                    }
+                }
+
+                for (int i = 0; i < rowValuesFinal.size(); i++) {
+
+                    pre_stmt = con.prepareStatement("SELECT url.url,title,citation from url where url.url=?;");
+                    pre_stmt.setString((1), rowValuesFinal.get(i));
+                    ResultSet Url = pre_stmt.executeQuery();
+
+                    while (Url.next()) {
+                        String url_obtained = Url.getString("url");
+                        String title = Url.getString("title");
+                        String citation = Url.getString("citation");
+                        String resultRow = "url:" + url_obtained + ";title:" + title + ";citation:" + citation;
+                        resultList.add(resultRow);
+                    }
+                }
+
+            } catch (SQLException e) {
+                System.out.println("Erro no storage Barrel!");
+                throw new RuntimeException(e);
+            }
+
+            System.out.println("cheguei aqui");
+            String str = String.join(";", resultList);
+            System.out.println(str);
+
+            if(str.isEmpty())
+                str = "nada";
+
+            h.print_on_server(str, c);
+
+        }
+        else {
+            try {
+                Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
+                con.setAutoCommit(false);
+                PreparedStatement pre_stmt;
+                ResultSet rs;
+                pre_stmt = con.prepareStatement("""
+                        SELECT url_url
+                        FROM url_url
+                        WHERE url_url1 = ?;""");
+                pre_stmt.setString(1, pesquisa[1]);
+                ResultSet URLS = pre_stmt.executeQuery();
+
+                while (true) {
+                    try {
+                        if (!URLS.next()) break;
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        rowValuesFinal.add(URLS.getString(1));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
 
             }
+            String str = String.join(";", resultList);
+            if(str.isEmpty())
+                str = "nada";
+            h.print_on_server(str, c);
         }
-
-        for(int i = 0; i < rowValuesFinal.size(); i++) {
-
-            pre_stmt = con.prepareStatement("SELECT url.url,title,citation from url where url.url=?;");
-            pre_stmt.setString((1), rowValuesFinal.get(i));
-            ResultSet Url = pre_stmt.executeQuery();
-
-            while (Url.next()) {
-                String url_obtained = Url.getString("url");
-                String title = Url.getString("title");
-                String citation = Url.getString("citation");
-                String resultRow = "url:" + url_obtained +";title:" + title + ";citation:" + citation;
-                resultList.add(resultRow);
-            }
-        }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        String str = String.join(";", resultList);
-        System.out.println(str);
-        h.print_on_server(str, c);
 
     }
 
