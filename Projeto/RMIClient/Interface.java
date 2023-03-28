@@ -298,16 +298,21 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                             break;
                         case(6):
-                            System.out.println("Que URL deseja pesquisar?");
-                            String url = read_text();
+                            if(logged_in) {
+                                System.out.println("Que URL deseja pesquisar?");
+                                String url = read_text();
 
-                            if(url == null){
-                                System.out.println("url invalido!\n");
-                                break;
+                                if (url == null) {
+                                    System.out.println("url invalido!\n");
+                                    break;
+                                }
+
+                                System.out.println(url);
+                                h.print_on_server("type | search1; pesquisa | " + url, (Hello_C_I) c);
                             }
-
-                            System.out.println(url);
-                            h.print_on_server("type | search1; pesquisa | " + url , (Hello_C_I) c);
+                            else{
+                                System.out.println("\nE necessario ter login efetuado para realizar esta operacao!\n");
+                            }
                             break;
                         case(7):
                             h.print_on_server("type | information;" , (Hello_C_I) c);
