@@ -3,6 +3,7 @@ package Downloader;
 import URLQueue.URLObject;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,15 +17,21 @@ import java.util.StringTokenizer;
 public class Downloader extends Thread{
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
+    private static final int PACKET_SIZE = 5000;
+    private int nDownloader;
+
+    public Downloader(int n){
+        nDownloader = n;
+    }
 
     public static void main(String[] args) throws Exception{
-        Downloader server = new Downloader();
+        Downloader server = new Downloader(Integer.parseInt(args[0]));
         server.start();
     }
 
     public void run() {
         try {
-            ReliableMulticast multicast = new ReliableMulticast(MULTICAST_ADDRESS,PORT);
+            ReliableMulticastServer multicast = new ReliableMulticastServer(nDownloader);
             // create socket without binding it (only for sending)
             QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
             int seqNum = 0;
@@ -49,9 +56,8 @@ public class Downloader extends Thread{
                     }
                     url.setCitation(citationText);
                     String urlString = "type|url;url|" + url.getUrl() + ";" + "title|" + url.getTitle() + ";" + "citation|" + url.getCitation() + ";";
-                    multicast.send(urlString, seqNum);
-                    System.out.println("Enviei: " + url.getUrl());
-                    seqNum += 1;
+                    System.out.println(urlString);
+                    multicast.send(urlString);
                     StringTokenizer tokens = new StringTokenizer(doc.text());
                     int countTokens = 0;
                     String stringWords = "type|word_list;url|" + url.getUrl() + "|";
@@ -68,14 +74,13 @@ public class Downloader extends Thread{
                         server.addToQueue(new_url);
                         countUrls += 1;
                     }
-                    multicast.send(stringWords, seqNum);
-                    multicast.receive();
-                    seqNum += 1;
-                    sleep(250);
-                    multicast.send(stringUrls, seqNum);
-                    seqNum += 1;
+                    multicast.send(stringWords);
+                    System.out.println(stringWords);
+                    multicast.send(stringUrls);
+                    System.out.println(stringUrls);
+                    System.out.println("------------");
                 }
-                catch (HttpStatusException e){
+                catch (HttpStatusException | UnsupportedMimeTypeException e){
                     System.out.println("Erro na procura");
                     continue;
                 }

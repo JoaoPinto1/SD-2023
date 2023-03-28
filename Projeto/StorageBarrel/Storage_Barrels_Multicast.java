@@ -1,21 +1,21 @@
 package StorageBarrel;
 
 import java.io.*;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.sql.*;
+
+import Downloader.ReliableMulticastServer;
 
 
 public class Storage_Barrels_Multicast extends Thread implements Runnable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
-    private MulticastSocket socket;
-    InetSocketAddress group;
 
     public Storage_Barrels_Multicast() throws RemoteException {
         super();
@@ -23,100 +23,31 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
 
     @Override
     public void run() {
-        try {
-            socket = new MulticastSocket(PORT);
-            // create socket and bind it
-            group = new InetSocketAddress(MULTICAST_ADDRESS, PORT);
+        try (MulticastSocket socket = new MulticastSocket(PORT)) {
+            InetSocketAddress group = new InetSocketAddress(MULTICAST_ADDRESS, PORT);
             NetworkInterface netIf = NetworkInterface.getByName("bge0");
             socket.joinGroup(group, netIf);
-
-            Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
-            c.setAutoCommit(false);
-            PreparedStatement pre_stmt;
-            ResultSet rs;
-            System.out.println("Opened database successfully");
-
+            ReliableMulticastClient multicast = new ReliableMulticastClient();
             while (true) {
+                System.out.println("Waiting");
                 byte[] buffer = new byte[5000];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                System.out.println("Waiting");
                 socket.receive(packet);
-                System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
-                String message = new String(packet.getData(), 0, packet.getLength());
-                if (message.equals("ACK")) {
-                    continue;
-                }
-                sendAck(packet);
-                String[] split_message = message.split("[|;]+");
-                if (split_message[1].equals("url")) {
-                    pre_stmt = c.prepareStatement("SELECT url FROM url WHERE url = ?;");
-                    pre_stmt.setString(1, split_message[3]);
-                    rs = pre_stmt.executeQuery();
-                    if (rs.next()) {
-                        pre_stmt = c.prepareStatement("UPDATE url set title=?,citation=? where url=?;");
-                        pre_stmt.setString(1,split_message[5]);
-                        pre_stmt.setString(2,split_message[7]);
-                        pre_stmt.setString(3,split_message[3]);
-                        pre_stmt.executeUpdate();
-                        c.commit();
-                    } else {
-                        pre_stmt = c.prepareStatement("INSERT INTO url VALUES (?,?,?);");
-                        pre_stmt.setString(1, split_message[3]);
-                        pre_stmt.setString(2, split_message[5]);
-                        pre_stmt.setString(3, split_message[7]);
-                        pre_stmt.executeUpdate();
-                        c.commit();
-                    }
-                }
-                if (split_message[1].equals("word_list")) {
-                    for (int i = 5; i < split_message.length; i += 2) {
-                        pre_stmt = c.prepareStatement("SELECT word FROM word WHERE word = ?;");
-                        pre_stmt.setString(1, split_message[i]);
-                        rs = pre_stmt.executeQuery();
-                        if (!rs.next()) {
-                            pre_stmt = c.prepareStatement("INSERT INTO word VALUES (?);");
-                            pre_stmt.setString(1, split_message[i]);
-                            pre_stmt.executeUpdate();
-
-                            pre_stmt = c.prepareStatement("SELECT word_word,url_url from word_url where word_word=? and url_url=?;");
-                            pre_stmt.setString(1, split_message[i]);
-                            pre_stmt.setString(2, split_message[3]);
-                            rs = pre_stmt.executeQuery();
-                            if (!rs.next()) {
-                                pre_stmt = c.prepareStatement("INSERT INTO word_url VALUES (?,?);");
-                                pre_stmt.setString(1, split_message[i]);
-                                pre_stmt.setString(2, split_message[3]);
-                                pre_stmt.executeUpdate();
-                                c.commit();
-                            }
-                        }
-                    }
-
-                    if (split_message[1].equals("url_list")) {
-                        System.out.println("oi");
-                        for (int i = 5; i < split_message.length; i += 2) {
-                            pre_stmt = c.prepareStatement("insert into url values (?,null,null);");
-                            pre_stmt.setString(1,split_message[i]);
-                            pre_stmt.executeUpdate();
-                            pre_stmt = c.prepareStatement("insert into url_url values (?,?);");
-                            pre_stmt.setString(1,split_message[3]);
-                            pre_stmt.setString(2,split_message[i]);
-                            pre_stmt.executeUpdate();
-                            c.commit();
-                        }
+                String message = new String(packet.getData()).trim();
+                System.out.println(message);
+                if (!message.equals("ACK")){
+                    if(Integer.parseInt(message.split("--")[0])!=-1) {
+                        int nDownloader = multicast.decodeDownloaderNumber(message.getBytes());
+                        int num = multicast.checkPacket(packet, nDownloader);
+                        if (num == 0)
+                            continue;
                     }
                 }
             }
         } catch (IOException | SQLException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    private void sendAck(DatagramPacket packet) throws IOException {
-        String message = "ACK";
-        byte[] ack = message.getBytes();
-        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-        DatagramPacket ackPacket = new DatagramPacket(ack, ack.length, group, PORT);
-        socket.send(ackPacket);
     }
 }
