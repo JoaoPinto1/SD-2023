@@ -12,7 +12,7 @@ public class URLQueueMain {
             Registry r = LocateRegistry.createRegistry(6000);
             URLQueueServer server = new URLQueueServer();
             r.rebind("Queue", server);
-            System.out.println("Queue server ready.");
+            System.out.println("Queue RMISearchModule.server ready.");
         }
         catch (Exception e){
             e.printStackTrace();

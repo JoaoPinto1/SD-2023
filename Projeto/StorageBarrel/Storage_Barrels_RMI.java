@@ -1,13 +1,15 @@
 package StorageBarrel;
+
 import RMIClient.Hello_S_I;
 import RMIClient.Hello_C_I;
+
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
 import java.sql.*;
 import java.util.*;
 
-public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_I,Runnable {
+public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_I, Runnable {
 
     public static Hello_S_I h;
     public static Storage_Barrels_RMI c;
@@ -29,7 +31,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
         ArrayList<String> rowValuesFinal = new ArrayList<String>();
         ArrayList<String> resultList = new ArrayList<String>();
 
-        if(pesquisa[0].equals("search;")) {
+        if (pesquisa[0].equals("search;")) {
             try {
                 Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
                 con.setAutoCommit(false);
@@ -114,13 +116,12 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
             String str = String.join(";", resultList);
             System.out.println(str);
 
-            if(str.isEmpty())
+            if (str.isEmpty())
                 str = "nada";
 
             h.print_on_server(str, c);
 
-        }
-        else {
+        } else {
             try {
                 Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
                 con.setAutoCommit(false);
@@ -150,31 +151,65 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
             }
             String str = String.join(";", resultList);
-            if(str.isEmpty())
+            if (str.isEmpty())
                 str = "nada";
-            h.print_on_server(str, c);
+
+            int retry = 0;
+            while (true) {
+                try {
+
+                    h.print_on_server(str, c);
+                    break;
+                } catch (java.rmi.ConnectException e) {
+
+                    if (++retry == 6) {
+                        System.out.println("Nao foi possivel realizar a conexao com o servidor.");
+                        break;
+                    }
+
+                    System.out.println("Conexao ao servidor falhou... tentando outra vez.");
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    try {
+                        h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
+                        h.subscribe("StorageBarrel", (Hello_C_I) c);
+                    } catch (ConnectException | NotBoundException ignored) {
+
+                    }
+                }
+            }
         }
 
     }
 
     /**
      * Inicia conexao com servidor e pergunta ao cliente o que ele deseja fazer, realiza diferentes operacoes tendo em conta a escolha do cliente
-     *
      */
     @Override
     public void run() {
 
-        try{
+        try {
 
-            h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
             c = new Storage_Barrels_RMI();
-            h.subscribe("StorageBarrel", (Hello_C_I) c);
+
+            try {
+                h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
+                h.subscribe("StorageBarrel", (Hello_C_I) c);
+            } catch (ConnectException e) {
+                System.out.println("Conexao do Barrel ao serevr falhou.");
+            }
+
+
             System.out.println("Storage Barrel Ready");
 
             while (true) {
-                
+
             }
-        
+
         } catch (Exception e) {
             System.out.println("Exception in main: " + e);
         }
