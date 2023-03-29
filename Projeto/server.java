@@ -13,15 +13,26 @@ import URLQueue.*;
 
 public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
+    private Thread t0;
+    private pagina_adminstracao pa;
     public ArrayList<Hello_C_I> clients;
     public HashMap<String, String> registed_users = new HashMap<String, String>();
     public server h;
     public final List<String> results;
+    public final List<String> searchs;
+    public Map<String, String> estado_sistema = new HashMap<>();
+    public Map<String, String> top_searchs = new HashMap<>();
 
-    public server(List<String> Result) throws RemoteException {
+    public server(List<String> Result ,List<String> Searchs,  Map<String, String> Estado ,  Map<String, String> tsearchs) throws RemoteException {
         super();
         this.results = Result;
+        this.searchs = Searchs;
+        this.estado_sistema = Estado;
+        this.top_searchs = tsearchs;
+        pa = new pagina_adminstracao(searchs , estado_sistema , top_searchs);
+        t0 = new Thread(pa);
         clients = new ArrayList<Hello_C_I>();
+        t0.start();
     }
 
     /**
@@ -58,12 +69,6 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                     c.print_on_client(a);
                 }
             }
-
-        }
-        else if(received_string[2].equals("status;")){
-
-        }
-        else if(received_string[2].equals("url_list;")){
 
         }
         else if(received_string[2].equals("search;")){
@@ -140,6 +145,12 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         }
         else if(received_string[2].equals("information;")){
 
+            synchronized (top_searchs){
+
+                String a = "type | status; information | " +  estado_sistema.toString() + " ;"  + top_searchs.toString();
+                c.print_on_client(a);
+            }
+
         }
 
     }
@@ -162,7 +173,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         String a;
 
         try (Scanner sc = new Scanner(System.in)) {
-            h = new server(results);
+            h = new server(results , searchs , estado_sistema, top_searchs);
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("XPTO", h);
 

@@ -168,7 +168,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
             h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
             c = new Storage_Barrels_RMI();
-            h.subscribe("Storage Barrel", (Hello_C_I) c);
+            h.subscribe("StorageBarrel", (Hello_C_I) c);
             System.out.println("Storage Barrel Ready");
 
             while (true) {

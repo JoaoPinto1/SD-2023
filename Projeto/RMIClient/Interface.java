@@ -3,7 +3,6 @@ package RMIClient;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -104,7 +103,41 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 }
 
             }
+        } else if (msg_received[3].equals("information")) {
+
+            String my_new_str;
+            int continuacao = 0;
+
+            System.out.println("\nEstado do sistema:\n");
+            for (int i = 5; i < msg_received.length; i++) {
+
+                if (msg_received[i].contains(";")) {
+                    continuacao = i;
+                    break;
+                }
+
+                my_new_str = msg_received[i].replace("{", "");
+                my_new_str = my_new_str.replace("}", "");
+                my_new_str = my_new_str.replace(",", "");
+
+                System.out.println(my_new_str);
+
+            }
+
+            System.out.println("\n10 pesquisas mais realizadas:\n");
+            msg_received[continuacao] = msg_received[continuacao].replace(";", "");
+
+            for (; continuacao < msg_received.length; continuacao++) {
+
+                my_new_str = msg_received[continuacao].replace("{", "");
+                my_new_str = my_new_str.replace("}", "");
+                my_new_str = my_new_str.replace(",", "");
+
+                System.out.println(my_new_str);
+
+            }
         }
+        System.out.println("\n");
     }
 
     /**
@@ -151,7 +184,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     }
 
     private static Boolean verify_value(String username) {
-        return !username.contains("|") && !username.contains(";") && !username.contains("\\n");
+        return !username.contains("|") && !username.contains(";") && !username.contains("\\n") && !username.contains(" ");
 
     }
 
@@ -187,7 +220,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
 
                             if (!verify_value(username)) {
-                                System.out.println("Nao pode conter os carateres '|' , ';' e '\\n'\n");
+                                System.out.println("Nao pode conter os carateres '|' , ';' , ' ' e '\\n'\n");
                                 break;
                             } else {
                                 System.out.println("\nPassword:");
@@ -197,7 +230,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                     break;
 
                                 if (!verify_value(password)) {
-                                    System.out.println("Nao pode conter os carateres '|' , ';' e '\\n'\n");
+                                    System.out.println("Nao pode conter os carateres '|' , ';' , ' ' e '\\n'\n");
                                     break;
                                 } else {
                                     String msg = "type | login; username | " + username + "; password | " + password;
@@ -215,7 +248,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                 break;
 
                             if (!verify_value(username_regist)) {
-                                System.out.println("Nao pode conter os carateres '|' , ';' e '\\n'\n");
+                                System.out.println("Nao pode conter os carateres '|' , ';', ' ' e '\\n'\n");
                                 break;
                             } else {
                                 System.out.println("\nInsira a password desejada:");
@@ -225,7 +258,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                     break;
 
                                 if (!verify_value(password_regist)) {
-                                    System.out.println("Nao pode conter os carateres '|' , ';' e '\\n'\n");
+                                    System.out.println("Nao pode conter os carateres '|' , ';' , ' ' e '\\n'\n");
                                     break;
                                 } else {
                                     String msg = "type | regist; username | " + username_regist + "; password | " + password_regist;
@@ -247,34 +280,61 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                             String URL = read_text();
 
+                            if (URL == null) {
+                                System.out.println("\nURL invalido!\n");
+                                break;
+                            }
+
+                            if (!verify_value(URL)) {
+                                System.out.println("Nao pode conter os carateres '|' , ';' , ' ' e '\\n'\n");
+                                break;
+                            }
+
                             String msg = "type | url; url | " + URL;
                             h.print_on_server(msg, (Hello_C_I) c);
                             break;
                         case (5):
+
+                            int detect_break = 0;
                             System.out.println("Quantos termos deseja pesquisar?");
                             int termos = read_int();
 
                             if (termos < 1) {
                                 System.out.println("Erro nos termos!");
+                                break;
                             }
                             String[] pesquisa = new String[termos];
 
                             for (int i = 0; i < termos; i++) {
                                 System.out.println("Insira o termo " + (i + 1) + ":");
                                 pesquisa[i] = read_text();
-                                pesquisa[i] = pesquisa[i];
+
+                                if (pesquisa[i] == null) {
+                                    System.out.println("termo de pesquisa invalido!");
+                                    detect_break++;
+                                    break;
+                                }
+
+                                if (!verify_value(pesquisa[i])) {
+                                    System.out.println("Nao pode conter os carateres '|' , ';' , ' ' e '\\n'\n");
+                                    detect_break++;
+                                    break;
+                                }
 
                                 if (pesquisa[i] == null) {
                                     System.out.println("Erro na pesquisa!");
+                                    detect_break++;
                                     break;
                                 }
                             }
 
+                            if (detect_break == 1)
+                                break;
+
                             String str = String.join(",", pesquisa);
-
                             System.out.println(str);
-
                             h.print_on_server("type | search; pesquisa | " + str, (Hello_C_I) c);
+
 
                             break;
                         case (6):
@@ -284,6 +344,11 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                                 if (url == null) {
                                     System.out.println("url invalido!\n");
+                                    break;
+                                }
+
+                                if (!verify_value(url)) {
+                                    System.out.println("Nao pode conter os carateres '|' , ';' , ' ' e '\\n'\n");
                                     break;
                                 }
 

@@ -5,7 +5,6 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.*;
-
 import RMIClient.Hello_C_I;
 import RMIClient.Hello_S_I;
 
@@ -15,10 +14,14 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public final ArrayList<Hello_C_I> clients_RMI;
     public serverb h;
     public final List<String> results;
+    public final List<String> searchs;
+    public Map<String, String> estado_sistema = new HashMap<>();
 
-    public serverb(List<String> Result) throws RemoteException {
+    public serverb(List<String> Result ,List<String> Searchs,  Map<String, String> Estado) throws RemoteException {
         super();
         this.results = Result;
+        this.searchs = Searchs;
+        this.estado_sistema = Estado;
         clients_RMI = new ArrayList<Hello_C_I>();
     }
 
@@ -38,11 +41,18 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     }
 
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
+
         System.out.println("Subscribing " + name);
         System.out.print("> ");
+
+        synchronized (estado_sistema) {
+            estado_sistema.put((name + clients_RMI.size()), "7001");
+            estado_sistema.notifyAll();;
+        }
+
         synchronized (clients_RMI) {
             clients_RMI.add(c);
-            System.out.println("Cliente adicionado , " + clients_RMI.size());
+            System.out.println("Storage Barrel adicionado , " + clients_RMI.size());
         }
     }
 
@@ -72,11 +82,9 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     // =======================================================
     @Override
     public void run() {
-        String a;
-
         try {
 
-            h = new serverb(results);
+            h = new serverb(results , searchs , estado_sistema);
 
             Registry r = LocateRegistry.createRegistry(7001);
             r.rebind("XPT", h);
@@ -126,6 +134,15 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
                     try {
                         client.print_on_client(new_string);
+
+                        synchronized (searchs){
+                            searchs.add(str[5]);
+                        }
+
+                        synchronized (estado_sistema){
+                            estado_sistema.notifyAll();
+                        }
+
                         connect = 1;
                     } catch (ConnectException e) {
 
