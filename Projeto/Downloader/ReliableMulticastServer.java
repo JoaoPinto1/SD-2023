@@ -17,7 +17,7 @@ public class ReliableMulticastServer {
     private int nDownloader;
 
 
-    public ReliableMulticastServer(int n) throws IOException{
+    public ReliableMulticastServer(int n) throws IOException {
         try {
             socket = new MulticastSocket(PORT);
             group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -38,7 +38,7 @@ public class ReliableMulticastServer {
         packet.setData(encodePacketData(sequenceNumber, message)); // Codifica o número de sequência no pacote
         try {
             socket.send(packet);
-            if(!messagesSent.contains(message)) {
+            if (!messagesSent.contains(message)) {
                 messagesSent.add(message);
                 sequenceNumber++;
             }
@@ -52,16 +52,19 @@ public class ReliableMulticastServer {
         byte[] buffer = new byte[PACKET_SIZE];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet);
-        String message = new String(packet.getData()).trim();
-        if(message.equals("ACK")){
-            //System.out.println("RECEBIDO ACK");
-        }
-        else {
-            int num = Integer.parseInt(message.split("--")[0]);
-            if (num == -1) {
-                if(Integer.parseInt(message.split("--")[1])==nDownloader)
-                    send(messagesSent.get(Integer.parseInt(message.split("--")[1])));
+        String[] message = new String(packet.getData()).trim().split("--");
+        if (message[0].equals("ACK")) {
+            if (Integer.parseInt(message[1]) == nDownloader) {
+                //System.out.println("RECEBIDO ACK");
+            } else {
+                receiveACKorNACK();
             }
+        } else if (Integer.parseInt(message[0]) == -1) {
+            if (Integer.parseInt(message[2]) == nDownloader) {
+                System.out.println("RECEBI UM NACK");
+                send(messagesSent.get(Integer.parseInt(message[1])));
+            }
+
         }
     }
 

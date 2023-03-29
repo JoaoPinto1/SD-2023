@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 
 import URLQueue.QueueInterface;
 
+import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.util.StringTokenizer;
 
@@ -80,7 +81,7 @@ public class Downloader extends Thread{
                     System.out.println(stringUrls);
                     System.out.println("------------");
                 }
-                catch (HttpStatusException | UnsupportedMimeTypeException e){
+                catch (IOException e){
                     System.out.println("Erro na procura");
                     continue;
                 }

@@ -1,13 +1,10 @@
 package StorageBarrel;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ReliableMulticastClient {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
@@ -37,7 +34,7 @@ public class ReliableMulticastClient {
             expectedSeqNumbers.replace(nDownloader,expectedPacket);
         }
         if (expectedPacket == seqNum) {
-            sendACK();
+            sendACK(nDownloader);
             insertDB(decodePacketMessage(packet.getData()));
             return 1;
         } else if (seqNum == -1) {
@@ -45,19 +42,28 @@ public class ReliableMulticastClient {
         } else if(expectedPacket < seqNum) {
             System.out.println("ohoh sending nack");
             sendNACK(expectedPacket, nDownloader);
-            byte[] buffer = new byte[PACKET_SIZE];
-            DatagramPacket new_packet = new DatagramPacket(buffer, buffer.length);
-            socket.receive(new_packet);
-            insertDB(decodePacketMessage(packet.getData()));
-            return checkPacket(new_packet, nDownloader);
+            return verifyPacket(packet,expectedPacket,nDownloader);
         }
         else{
             return 0;
         }
     }
 
-    private void sendACK() throws IOException {
-        byte[] buffer = "ACK".getBytes();
+    private int verifyPacket(DatagramPacket packet, int expectedPacket, int nDownloader) throws IOException, SQLException {
+        byte[] buffer = new byte[PACKET_SIZE];
+        DatagramPacket new_packet = new DatagramPacket(buffer, buffer.length);
+        socket.receive(new_packet);
+        if(decodePacketSequenceNumber(new_packet.getData())==expectedPacket && decodeDownloaderNumber(new_packet.getData())==nDownloader) {
+            insertDB(decodePacketMessage(packet.getData()));
+            return checkPacket(new_packet, nDownloader);
+        }
+        else{
+            return verifyPacket(new_packet,expectedPacket,nDownloader);
+        }
+    }
+
+    private void sendACK(int nDownloader) throws IOException {
+        byte[] buffer = ("ACK--"+nDownloader).getBytes();
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
         socket.send(packet);
     }
@@ -66,6 +72,7 @@ public class ReliableMulticastClient {
         byte[] buffer = String.format(-1 + "--%d--%d", seqNum,nDownloader).getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
         socket.send(packet);
+        System.out.printf(-1 + "--%d--%d%n", seqNum,nDownloader);
     }
 
     private int decodePacketSequenceNumber(byte[] data) {

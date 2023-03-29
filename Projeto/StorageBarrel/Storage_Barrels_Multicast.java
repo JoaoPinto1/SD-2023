@@ -33,11 +33,10 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
                 byte[] buffer = new byte[5000];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-                String message = new String(packet.getData()).trim();
-                System.out.println(message);
-                if (!message.equals("ACK")){
-                    if(Integer.parseInt(message.split("--")[0])!=-1) {
-                        int nDownloader = multicast.decodeDownloaderNumber(message.getBytes());
+                String[] message = new String(packet.getData()).trim().split("--");
+                if (!message[0].equals("ACK")){
+                    if(Integer.parseInt(message[0])!=-1) {
+                        int nDownloader = multicast.decodeDownloaderNumber(packet.getData());
                         int num = multicast.checkPacket(packet, nDownloader);
                         if (num == 0)
                             continue;
