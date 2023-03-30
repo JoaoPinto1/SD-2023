@@ -1,19 +1,25 @@
 package RMISearchModule;
 
+import Downloader.Downloader;
+import RMIClient.Hello_C_I;
+
+import java.rmi.RemoteException;
 import java.util.*;
 
 public class pagina_adminstracao implements Runnable {
 
     public final List<String> searchs;
-    public Map<String, String> estado_sistema;
 
+    public ArrayList<Hello_C_I> storage_barrels;
+    public ArrayList<Hello_C_I> downloaders;
     public Map<String, String> top_searchs;
 
-    public pagina_adminstracao(List<String> searchs, Map<String, String> Estado , Map<String, String> tsearchs) {
+    public pagina_adminstracao(List<String> searchs, ArrayList<Hello_C_I> storage_barrels , Map<String, String> tsearchs , ArrayList<Hello_C_I> downloaders) {
         super();
         this.searchs = searchs;
-        this.estado_sistema = Estado;
+        this.storage_barrels = storage_barrels;
         this.top_searchs = tsearchs;
+        this.downloaders = downloaders;
     }
 
     public static LinkedHashMap<String, String> top10(List<String> arr) {
@@ -37,6 +43,59 @@ public class pagina_adminstracao implements Runnable {
         return top10;
     }
 
+    private void RemoveBarrels(List<Hello_C_I> removedBarrels){
+        synchronized (storage_barrels) {
+            for (Hello_C_I s : removedBarrels) {
+                storage_barrels.remove(s);
+            }
+        }
+    }
+
+    private void RemoveDownloader(List<Hello_C_I> removedDownloader){
+        synchronized (downloaders) {
+            for (Hello_C_I s : removedDownloader) {
+                downloaders.remove(s);
+            }
+        }
+    }
+
+    private void check_downloaders(){
+
+        List<Hello_C_I> removed_downloaders = new ArrayList<>();
+
+        synchronized (downloaders) {
+            for (Hello_C_I s : downloaders) {
+
+                try {
+                    s.ping();
+                } catch (RemoteException e) {
+                    removed_downloaders.add(s);
+                }
+
+            }
+            RemoveDownloader(removed_downloaders);
+        }
+    }
+
+
+    private void check_storage_barrels(){
+
+        List<Hello_C_I> removed_barrels = new ArrayList<>();
+
+        synchronized (storage_barrels) {
+            for (Hello_C_I s : storage_barrels) {
+
+                try {
+                    s.ping();
+                } catch (RemoteException e) {
+                    removed_barrels.add(s);
+                }
+
+            }
+            RemoveBarrels(removed_barrels);
+        }
+    }
+
     @Override
     public void run() {
 
@@ -44,10 +103,10 @@ public class pagina_adminstracao implements Runnable {
 
         while (true) {
 
-            synchronized (estado_sistema) {
+            synchronized (storage_barrels) {
 
                 try {
-                    estado_sistema.wait();
+                    storage_barrels.wait();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -59,6 +118,10 @@ public class pagina_adminstracao implements Runnable {
                         top_searchs.clear();
                         top_searchs.putAll(top10Map);
 
+                        check_storage_barrels();
+                        check_downloaders();
+
+                        storage_barrels.notifyAll();
 
                     }
 

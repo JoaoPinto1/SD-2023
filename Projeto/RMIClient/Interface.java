@@ -46,7 +46,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
         }
         //type | status; search | result; " + received_string[5]
         else if (msg_received[3].equals("search")) {
-
+            System.out.println("»»»»»»»»»»»»»»»»Resultados da pesquisa por termos«««««««««««««««««««");
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
 
@@ -74,8 +74,9 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 }
 
             }
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
         } else if (msg_received[3].equals("search1")) {
-
+            System.out.println("»»»»»»»»»»»»»»»»Resultados da pesquisa por url«««««««««««««««««««");
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
 
@@ -103,31 +104,30 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 }
 
             }
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
         } else if (msg_received[3].equals("information")) {
-
             String my_new_str;
             int continuacao = 0;
+            System.out.println("««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««");
+            System.out.println("\n.......................... Estado do sistema: ..............................\n");
 
-            System.out.println("\nEstado do sistema:\n");
-            for (int i = 5; i < msg_received.length; i++) {
+            my_new_str = msg_received[5].replace("{", "");
+            my_new_str = my_new_str.replace("}", "");
+            my_new_str = my_new_str.replace(",", "");
 
-                if (msg_received[i].contains(";")) {
-                    continuacao = i;
-                    break;
-                }
+            System.out.println("Numero de Storage Barrels ativos: " + my_new_str);
 
-                my_new_str = msg_received[i].replace("{", "");
-                my_new_str = my_new_str.replace("}", "");
-                my_new_str = my_new_str.replace(",", "");
+            my_new_str = msg_received[6].replace("{", "");
+            my_new_str = my_new_str.replace("}", "");
+            my_new_str = my_new_str.replace(",", "");
+            my_new_str = my_new_str.replace(";", "");
 
-                System.out.println(my_new_str);
+            System.out.println("Numero de Downloaders ativos: " + my_new_str);
 
-            }
+            System.out.println("\n.......................... 10 pesquisas mais realizadas: ....................\n");
+            msg_received[7] = msg_received[7].replace(";", "");
 
-            System.out.println("\n10 pesquisas mais realizadas:\n");
-            msg_received[continuacao] = msg_received[continuacao].replace(";", "");
-
-            for (; continuacao < msg_received.length; continuacao++) {
+            for (continuacao = 7; continuacao < msg_received.length; continuacao++) {
 
                 my_new_str = msg_received[continuacao].replace("{", "");
                 my_new_str = my_new_str.replace("}", "");
@@ -136,7 +136,14 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 System.out.println(my_new_str);
 
             }
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+            System.out.println("\n");
         }
+
+    }
+
+    public void ping(){
+
     }
 
     /**
@@ -418,7 +425,6 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                 break;
 
                             String str = String.join(",", pesquisa);
-                            System.out.println(str);
                             while (true) {
                                 try {
                                     h.print_on_server("type | search; pesquisa | " + str, (Hello_C_I) c);
