@@ -189,6 +189,10 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
     }
 
+    public void ping(){
+
+    }
+
     /**
      * Inicia conexao com servidor e pergunta ao cliente o que ele deseja fazer, realiza diferentes operacoes tendo em conta a escolha do cliente
      */
@@ -203,7 +207,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
             while(true) {
                 try {
                     h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
-                    h.subscribe("StorageBarrel", (Hello_C_I) c);
+                    h.subscribe("StorageBarrel" + ProcessHandle.current().pid(), (Hello_C_I) c);
                     break;
                 } catch (ConnectException e) {
                     if (++retry == 6) {
@@ -226,7 +230,6 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
                     }
                 }
             }
-
 
             System.out.println("Storage Barrel Ready");
 

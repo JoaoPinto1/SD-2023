@@ -7,6 +7,8 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.*;
+
+import Downloader.Downloader;
 import RMIClient.Hello_C_I;
 import RMIClient.Hello_S_I;
 
@@ -17,18 +19,21 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public serverb h;
     public final List<String> results;
     public final List<String> searchs;
-    public Map<String, String> estado_sistema = new HashMap<>();
 
-    public serverb(List<String> Result ,List<String> Searchs,  Map<String, String> Estado) throws RemoteException {
+
+    public serverb(List<String> Result ,List<String> Searchs,ArrayList<Hello_C_I>storage_barrels) throws RemoteException {
         super();
         this.results = Result;
         this.searchs = Searchs;
-        this.estado_sistema = Estado;
-        clients_RMI = new ArrayList<Hello_C_I>();
+        this.clients_RMI = storage_barrels;
     }
 
     public void print_on_client(String s) throws RemoteException {
         System.out.println(s);
+    }
+
+    public void downloader_subscribe(String s,Hello_C_I client){
+
     }
 
     public void print_on_server(String s, Hello_C_I c) throws RemoteException {
@@ -41,16 +46,15 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         }
 
     }
+    public void ping(){
+
+    }
 
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
 
         System.out.println("Subscribing " + name);
         System.out.print("> ");
 
-        synchronized (estado_sistema) {
-            estado_sistema.put((name + clients_RMI.size()), "7001");
-            estado_sistema.notifyAll();;
-        }
 
         synchronized (clients_RMI) {
             clients_RMI.add(c);
@@ -65,6 +69,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
         synchronized (clients_RMI) {
             clients_RMI.remove(c);
+            clients_RMI.notifyAll();
         }
     }
 
@@ -88,7 +93,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public void run() {
         try {
 
-            h = new serverb(results , searchs , estado_sistema);
+            h = new serverb(results , searchs , clients_RMI);
 
             Registry r = LocateRegistry.createRegistry(7001);
             r.rebind("XPT", h);
@@ -143,8 +148,8 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                             searchs.add(str[5]);
                         }
 
-                        synchronized (estado_sistema){
-                            estado_sistema.notifyAll();
+                        synchronized (clients_RMI){
+                            clients_RMI.notifyAll();
                         }
 
                         connect = 1;
@@ -152,6 +157,11 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
                         System.out.println("Storage Barrel Invalido!");
                         h.unsubscribe("Storage Barrel", client);
+
+                        synchronized (clients_RMI){
+                            clients_RMI.notifyAll();
+                        }
+
                         System.out.println("looking for new barrel!");
 
                         client = RandomClient();
@@ -159,8 +169,8 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                         while (client == null) {
 
                             try {
-                                System.out.println("looking for new barrel!");
-                                Thread.sleep(2000);
+                                System.out.println("looking for new barrel ...");
+                                Thread.sleep(1000);
                             } catch (InterruptedException ex) {
                                 throw new RuntimeException(ex);
                             }

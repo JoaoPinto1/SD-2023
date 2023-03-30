@@ -1,5 +1,8 @@
 package RMISearchModule;
 
+import Downloader.Downloader;
+import RMIClient.Hello_C_I;
+
 import java.rmi.server.*;
 import java.rmi.*;
 import java.util.*;
@@ -12,11 +15,12 @@ public class search_module extends UnicastRemoteObject implements Search_Module_
     private serverb sb;
     public List<String> results;
     public final List<String> searchs;
-    public Map<String, String> estado_sistema = new HashMap<>();
     public Map<String, String> top_searchs = new HashMap<>();
+    public ArrayList<Hello_C_I> storage_barrels;
+    public ArrayList<Hello_C_I> downloaders;
 
     /**
-     * Inicia os dois RMISearchModule.server necessarios, o que espera do search module e o dos barrels.
+     * Inicia os dois RMISearchModule.server necessarios, o dos clientes e o dos barrels.
      *
      * @throws RemoteException
      */
@@ -25,11 +29,12 @@ public class search_module extends UnicastRemoteObject implements Search_Module_
         super();
         results = new ArrayList<String>();
         searchs = new ArrayList<String>();
-        estado_sistema = new HashMap<String, String>();
         top_searchs = new HashMap<String , String>();
-        sb = new serverb(results , searchs , estado_sistema);
+        storage_barrels = new ArrayList<Hello_C_I>();
+        downloaders = new ArrayList<Hello_C_I>();
+        sb = new serverb(results , searchs  , storage_barrels);
         t1 = new Thread(sb);
-        sc = new server(results , searchs , estado_sistema , top_searchs);
+        sc = new server(results , searchs  , top_searchs , storage_barrels , downloaders);
         t2 = new Thread(sc);
         t1.start();
         t2.start();

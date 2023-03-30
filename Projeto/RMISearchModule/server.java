@@ -1,5 +1,6 @@
 package RMISearchModule;
 
+import java.io.Serializable;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.LocateRegistry;
@@ -8,12 +9,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.*;
 
+import Downloader.Downloader;
 import RMIClient.Hello_C_I;
 import RMIClient.Hello_S_I;
 import URLQueue.*;
 
 
-public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
+public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, Serializable {
 
     private Thread t0;
     private pagina_adminstracao pa;
@@ -22,28 +24,35 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
     public server h;
     public final List<String> results;
     public final List<String> searchs;
-    public Map<String, String> estado_sistema = new HashMap<>();
     public Map<String, String> top_searchs = new HashMap<>();
+    public ArrayList<Hello_C_I> storage_barrels;
 
-    public server(List<String> Result ,List<String> Searchs,  Map<String, String> Estado ,  Map<String, String> tsearchs) throws RemoteException {
+    public ArrayList<Hello_C_I> downloaders;
+
+
+
+    public server(List<String> Result, List<String> Searchs, Map<String, String> tsearchs, ArrayList<Hello_C_I> storage_barrels , ArrayList<Hello_C_I> downloaders) throws RemoteException {
         super();
         this.results = Result;
         this.searchs = Searchs;
-        this.estado_sistema = Estado;
         this.top_searchs = tsearchs;
+        this.storage_barrels = storage_barrels;
+        this.downloaders = downloaders;
         clients = new ArrayList<Hello_C_I>();
     }
 
     /**
      * Realiza as diferentes funcoes tendo em conta a mensagem recevida.
      */
-    public void print_on_server(String s , Hello_C_I c) throws RemoteException {
+
+
+    public void print_on_server(String s, Hello_C_I c) throws RemoteException {
 
         String[] received_string = s.split(" ", 0);
         System.out.println(Arrays.toString(received_string));
 
         //type | login; username | andre; password | moreira
-        if(received_string[2].equals("login;")){
+        if (received_string[2].equals("login;")) {
             synchronized (registed_users) {
                 if (registed_users.containsKey(received_string[5].replace(";", ""))) {
 
@@ -54,7 +63,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                     if (user_password.equals(received_string[8])) {
                         try {
                             c.print_on_client(a);
-                        }catch(java.rmi.RemoteException e){
+                        } catch (java.rmi.RemoteException e) {
                             System.out.println("Erro a enviar ao cliente.");
                         }
 
@@ -66,7 +75,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                         a = "type | status; register | failed; msg | Username ou password errados.";
                         try {
                             c.print_on_client(a);
-                        }catch(java.rmi.RemoteException e){
+                        } catch (java.rmi.RemoteException e) {
                             System.out.println("Erro a enviar ao cliente.");
                         }
                     }
@@ -76,20 +85,19 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                     try {
                         c.print_on_client(a);
                         System.out.println("dei");
-                    }catch(java.rmi.RemoteException e){
+                    } catch (java.rmi.RemoteException e) {
                         System.out.println("Erro a enviar ao cliente.");
 
                     }
                 }
             }
 
-        }
-        else if(received_string[2].equals("search;")){
-            try{
+        } else if (received_string[2].equals("search;")) {
+            try {
                 //usar waits
-                synchronized (results){
+                synchronized (results) {
 
-                    while(results.isEmpty()){
+                    while (results.isEmpty()) {
                         results.notify();
                         System.out.println("o que vou mandar:" + s);
                         results.add(s);
@@ -102,23 +110,22 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
                     try {
                         c.print_on_client("type | status; search | result; " + resultados);
-                    }catch(java.rmi.RemoteException e){
+                    } catch (java.rmi.RemoteException e) {
                         System.out.println("Erro a enviar ao cliente.");
                     }
 
                 }
 
-            }catch(Exception re){
+            } catch (Exception re) {
                 System.out.println("Error");
 
             }
-        }
-        else if(received_string[2].equals("search1;")){
-            try{
+        } else if (received_string[2].equals("search1;")) {
+            try {
                 //usar waits
-                synchronized (results){
+                synchronized (results) {
 
-                    while(results.isEmpty()){
+                    while (results.isEmpty()) {
                         results.notify();
                         System.out.println("o que vou mandar:" + s);
                         results.add(s);
@@ -130,24 +137,23 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
                     try {
                         c.print_on_client("type | status; search1 | result; " + resultados);
-                    }catch(java.rmi.RemoteException e){
+                    } catch (java.rmi.RemoteException e) {
                         System.out.println("Erro a enviar ao cliente.");
                     }
                 }
 
-            }catch(Exception re){
+            } catch (Exception re) {
                 System.out.println("Error");
 
             }
-        }
-        else if(received_string[2].equals("regist;")){
+        } else if (received_string[2].equals("regist;")) {
 
             if (registed_users.containsKey(received_string[5].replace(";", ""))) {
                 String a = "type | status; register | failed; msg | O username ja se encontra utilizado.";
 
                 try {
                     c.print_on_client(a);
-                }catch(java.rmi.RemoteException e){
+                } catch (java.rmi.RemoteException e) {
                     System.out.println("Erro a enviar ao cliente.");
                 }
 
@@ -156,41 +162,48 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                 String a = "type | status; register | sucess; msg | Registo concluido com sucesso!";
                 try {
                     c.print_on_client(a);
-                }catch(java.rmi.RemoteException e){
+                } catch (java.rmi.RemoteException e) {
                     System.out.println("Erro a enviar ao cliente.");
                 }
             }
-        }
-        else if(received_string[2].equals("logout;")){
+        } else if (received_string[2].equals("logout;")) {
 
             String a = "type | status; logged | off; msg | Logout realizado com sucesso!";
             try {
                 c.print_on_client(a);
-            }catch(java.rmi.RemoteException e){
+            } catch (java.rmi.RemoteException e) {
                 System.out.println("Erro a enviar ao cliente.");
             }
 
         }
         //"type | url; url | " + URL;
-        else if(received_string[2].equals("url;")){
+        else if (received_string[2].equals("url;")) {
 
             URLObject url = new URLObject(received_string[5]);
             try {
                 QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
                 server.addToQueue(url);
-            }catch(Exception re){
+            } catch (Exception re) {
                 System.out.println("Error");
             }
-        }
-        else if(received_string[2].equals("information;")){
+        } else if (received_string[2].equals("information;")) {
 
-            synchronized (top_searchs){
+            synchronized (storage_barrels) {
 
-                String a = "type | status; information | " +  estado_sistema.toString() + " ;"  + top_searchs.toString();
+                storage_barrels.notifyAll();
+
                 try {
-                    c.print_on_client(a);
-                }catch(java.rmi.RemoteException e){
-                    System.out.println("Erro a enviar ao cliente.");
+                    storage_barrels.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                synchronized (top_searchs) {
+                    String a = "type | status; information | " + storage_barrels.size() + " ;"  + downloaders.size() + " ;" + top_searchs.toString();
+                    try {
+                        c.print_on_client(a);
+                    } catch (java.rmi.RemoteException e) {
+                        System.out.println("Erro a enviar ao cliente.");
+                    }
                 }
             }
 
@@ -210,6 +223,14 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
         clients.remove(c);
     }
 
+
+    public void downloader_subscribe(String s,Hello_C_I c) throws RemoteException {
+        synchronized (downloaders) {
+            downloaders.add(c);
+        }
+        System.out.println("Subscribing Downloader," + downloaders.size());
+    }
+
     // =======================================================
     @Override
     public void run() {
@@ -217,19 +238,19 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
         try (Scanner sc = new Scanner(System.in)) {
 
-            h = new server(results , searchs , estado_sistema, top_searchs);
+            h = new server(results, searchs, top_searchs, storage_barrels,downloaders);
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("XPTO", h);
             System.out.println("Hello Server ready.");
-            pa = new pagina_adminstracao(searchs , estado_sistema , top_searchs);
+            pa = new pagina_adminstracao(searchs, storage_barrels, top_searchs , downloaders);
             t0 = new Thread(pa);
             t0.start();
 
             while (true) {
-                
+
             }
         } catch (Exception re) {
             System.out.println("Exception in HelloImpl.main: " + re);
-        } 
+        }
     }
 }

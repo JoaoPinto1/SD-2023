@@ -1,5 +1,8 @@
 package Downloader;
 
+import RMIClient.Hello_C_I;
+import RMIClient.Hello_S_I;
+import RMISearchModule.pagina_adminstracao;
 import URLQueue.URLObject;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -12,14 +15,18 @@ import org.jsoup.select.Elements;
 import URLQueue.QueueInterface;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.StringTokenizer;
 
-public class Downloader extends Thread{
+public class Downloader extends Thread implements Serializable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
     private static final int PACKET_SIZE = 5000;
     private int nDownloader;
+    private static Thread t0;
+    private static Downloader_RMI drmi;
 
     public Downloader(int n){
         nDownloader = n;
@@ -27,7 +34,12 @@ public class Downloader extends Thread{
 
     public static void main(String[] args) throws Exception{
         Downloader server = new Downloader(Integer.parseInt(args[0]));
+
         server.start();
+
+        drmi = new Downloader_RMI();
+        t0 = new Thread(drmi);
+        t0.start();
     }
 
     public void run() {
@@ -90,4 +102,5 @@ public class Downloader extends Thread{
             e.printStackTrace();
         }
     }
+
 }
