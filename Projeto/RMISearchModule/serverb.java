@@ -61,6 +61,8 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
+
+
         synchronized (clients_RMI) {
             clients_RMI.remove(c);
         }
@@ -114,7 +116,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
             while (client == null) {
                 try {
                     System.out.println("looking for new barrel!");
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }

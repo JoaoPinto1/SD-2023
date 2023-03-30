@@ -127,6 +127,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
                 con.setAutoCommit(false);
                 PreparedStatement pre_stmt;
                 ResultSet rs;
+                System.out.println(pesquisa[1]);
                 pre_stmt = con.prepareStatement("""
                         SELECT url_url
                         FROM url_url
@@ -150,7 +151,9 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
                 throw new RuntimeException(e);
 
             }
-            String str = String.join(";", resultList);
+
+            String str = String.join(";", rowValuesFinal);
+
             if (str.isEmpty())
                 str = "nada";
 
@@ -195,12 +198,33 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
         try {
 
             c = new Storage_Barrels_RMI();
+            int retry = 0;
 
-            try {
-                h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
-                h.subscribe("StorageBarrel", (Hello_C_I) c);
-            } catch (ConnectException e) {
-                System.out.println("Conexao do Barrel ao serevr falhou.");
+            while(true) {
+                try {
+                    h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
+                    h.subscribe("StorageBarrel", (Hello_C_I) c);
+                    break;
+                } catch (ConnectException e) {
+                    if (++retry == 6) {
+                        System.out.println("Nao foi possivel realizar a conexao com o servidor.");
+                        return;
+                    }
+
+                    System.out.println("Conexao ao servidor falhou... tentando outra vez.");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    try{
+                        h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
+                        h.subscribe("StorageBarrel", (Hello_C_I) c);
+                    }catch (ConnectException ignored){
+
+                    }
+                }
             }
 
 

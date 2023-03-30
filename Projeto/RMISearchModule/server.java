@@ -41,11 +41,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
 
         String[] received_string = s.split(" ", 0);
         System.out.println(Arrays.toString(received_string));
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         //type | login; username | andre; password | moreira
         if(received_string[2].equals("login;")){
             synchronized (registed_users) {
@@ -58,9 +54,8 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                     if (user_password.equals(received_string[8])) {
                         try {
                             c.print_on_client(a);
-                            System.out.println("dei");
                         }catch(java.rmi.RemoteException e){
-                            h.unsubscribe("Cliente", c);
+                            System.out.println("Erro a enviar ao cliente.");
                         }
 
                         //fazer login ao user
@@ -71,9 +66,8 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                         a = "type | status; register | failed; msg | Username ou password errados.";
                         try {
                             c.print_on_client(a);
-                            System.out.println("dei");
                         }catch(java.rmi.RemoteException e){
-                            h.unsubscribe("Cliente", c);
+                            System.out.println("Erro a enviar ao cliente.");
                         }
                     }
 
@@ -83,7 +77,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                         c.print_on_client(a);
                         System.out.println("dei");
                     }catch(java.rmi.RemoteException e){
-                       // h.unsubscribe("Cliente", c);
+                        System.out.println("Erro a enviar ao cliente.");
 
                     }
                 }
@@ -109,7 +103,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                     try {
                         c.print_on_client("type | status; search | result; " + resultados);
                     }catch(java.rmi.RemoteException e){
-                        h.unsubscribe("Cliente", c);
+                        System.out.println("Erro a enviar ao cliente.");
                     }
 
                 }
@@ -137,7 +131,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                     try {
                         c.print_on_client("type | status; search1 | result; " + resultados);
                     }catch(java.rmi.RemoteException e){
-                        h.unsubscribe("Cliente", c);
+                        System.out.println("Erro a enviar ao cliente.");
                     }
                 }
 
@@ -154,7 +148,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                 try {
                     c.print_on_client(a);
                 }catch(java.rmi.RemoteException e){
-                    h.unsubscribe("Cliente", c);
+                    System.out.println("Erro a enviar ao cliente.");
                 }
 
             } else {
@@ -163,7 +157,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                 try {
                     c.print_on_client(a);
                 }catch(java.rmi.RemoteException e){
-                    h.unsubscribe("Cliente", c);
+                    System.out.println("Erro a enviar ao cliente.");
                 }
             }
         }
@@ -173,7 +167,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
             try {
                 c.print_on_client(a);
             }catch(java.rmi.RemoteException e){
-                h.unsubscribe("Cliente", c);
+                System.out.println("Erro a enviar ao cliente.");
             }
 
         }
@@ -196,7 +190,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable {
                 try {
                     c.print_on_client(a);
                 }catch(java.rmi.RemoteException e){
-                    h.unsubscribe("Cliente", c);
+                    System.out.println("Erro a enviar ao cliente.");
                 }
             }
 

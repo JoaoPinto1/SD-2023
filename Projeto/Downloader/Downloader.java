@@ -81,7 +81,7 @@ public class Downloader extends Thread{
                     System.out.println(stringUrls);
                     System.out.println("------------");
                 }
-                catch (IOException e){
+                catch (IOException | IllegalArgumentException e){
                     System.out.println("Erro na procura");
                     continue;
                 }

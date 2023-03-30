@@ -46,7 +46,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
         }
         //type | status; search | result; " + received_string[5]
         else if (msg_received[3].equals("search")) {
-
+            System.out.println("»»»»»»»»»»»»»»»»Resultados da pesquisa por termos«««««««««««««««««««");
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
 
@@ -74,8 +74,9 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 }
 
             }
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
         } else if (msg_received[3].equals("search1")) {
-
+            System.out.println("»»»»»»»»»»»»»»»»Resultados da pesquisa por url«««««««««««««««««««");
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
 
@@ -103,8 +104,9 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 }
 
             }
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
         } else if (msg_received[3].equals("information")) {
-
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»Informacoes gerais do sistema««««««««««««««««");
             String my_new_str;
             int continuacao = 0;
 
@@ -136,7 +138,10 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                 System.out.println(my_new_str);
 
             }
+            System.out.println("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+            System.out.println("\n");
         }
+
     }
 
     /**
@@ -418,7 +423,6 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                 break;
 
                             String str = String.join(",", pesquisa);
-                            System.out.println(str);
                             while (true) {
                                 try {
                                     h.print_on_server("type | search; pesquisa | " + str, (Hello_C_I) c);
