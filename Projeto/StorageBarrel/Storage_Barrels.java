@@ -10,7 +10,7 @@ public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barr
     private Storage_Barrels_Multicast sMUL;
 
     /**
-     * Inicia os dois server necessarios, o que espera do search module e o dos barrels.
+     * Inicia os dois RMISearchModule.server necessarios, o que espera do search module e o dos barrels.
      * @throws RemoteException
      */
     public Storage_Barrels() throws RemoteException{
