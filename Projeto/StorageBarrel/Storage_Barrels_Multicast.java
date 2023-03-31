@@ -16,15 +16,17 @@ import Downloader.ReliableMulticastServer;
 public class Storage_Barrels_Multicast extends Thread implements Runnable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
+    private int nBarrel;
 
-    public Storage_Barrels_Multicast() throws RemoteException {
+    public Storage_Barrels_Multicast(int nBarrel) throws RemoteException {
         super();
+        this.nBarrel = nBarrel;
     }
 
     @Override
     public void run() {
         try {
-            ReliableMulticastClient multicast = new ReliableMulticastClient();
+            ReliableMulticastClient multicast = new ReliableMulticastClient(nBarrel);
             while (true) {
                 System.out.println("Waiting");
                 DatagramPacket packet = multicast.receive();

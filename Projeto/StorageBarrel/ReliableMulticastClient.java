@@ -16,13 +16,14 @@ public class ReliableMulticastClient {
     private HashMap<Integer, Integer> expectedSeqNumbers;
     private InetSocketAddress receiveGroup;
 
-    public ReliableMulticastClient() throws IOException, SQLException {
+    public ReliableMulticastClient(int nBarrel) throws IOException, SQLException {
         socket = new MulticastSocket(PORT);
         group = InetAddress.getByName(MULTICAST_ADDRESS);
         receiveGroup = new InetSocketAddress(MULTICAST_ADDRESS, PORT);
         NetworkInterface netIf = NetworkInterface.getByName("bge0");
         socket.joinGroup(receiveGroup, netIf);
-        c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
+        String db = "jdbc:postgresql://localhost:5432/db" + nBarrel;
+        c = DriverManager.getConnection(db, "test", "test");
         c.setAutoCommit(false);
         expectedSeqNumbers = new HashMap<>();
     }

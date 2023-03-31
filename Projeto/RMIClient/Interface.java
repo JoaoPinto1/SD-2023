@@ -15,17 +15,22 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     }
 
     /**
-     * Realiza diferentes operacoes tendo em conta mensagem recevida pelo servidor
+     * Realiza diferentes operacoes tendo em conta a string recevida
+     * @param s string recevida
+     * @throws RemoteException
      */
     public void print_on_client(String s) throws RemoteException {
 
         //"type | status; logged | on; msg | Welcome to the app"
         String[] msg_received = s.split(" ", 0);
 
+
         if (msg_received[3].equals("logged")) {
 
+            //fica com o valor do login, true se sucedeu e false se falhou
             logged_in = msg_received[5].equals("on;");
 
+            //imprime mensagem recevida do servidor
             if (msg_received.length > 6) {
                 for (int i = 8; i < msg_received.length; i++) {
                     System.out.print(msg_received[i] + " ");
@@ -36,6 +41,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
         } else if (msg_received[3].equals("register")) {
             System.out.println();
+            //imprime mensagem recevida pelo servidor, pode dizer que sucedeu ou falhou.
             if (msg_received.length > 6) {
                 for (int i = 8; i < msg_received.length; i++) {
                     System.out.print(msg_received[i] + " ");
@@ -50,17 +56,21 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
 
+            //se nao foi encontrado nada na pesquisa dizemos isso.
             if (separate_results[0].equals("nada"))
                 System.out.println("Nao foi encontrado nada!");
 
             else {
                 int counter = 0;
 
+                //resultados sao mostrados 10 por 10
                 for (int i = 0; i < separate_results.length; i += 3) {
 
                     counter++;
+                    //url , titulo , citacao
                     System.out.println(separate_results[i] + "\n" + separate_results[i + 1] + "\n" + separate_results[i + 2] + "\n");
 
+                    //ja apresentamos 10 resultados perguntamos se quer ver os proximos 10.
                     if (counter == 10) {
                         System.out.println("Deseja ir para a proxima pagina?\n");
                         System.out.println("1 - sim\n2 - nao");
@@ -79,18 +89,18 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
             System.out.println("»»»»»»»»»»»»»»»»Resultados da pesquisa por url«««««««««««««««««««");
             String search_results = msg_received[6];
             String[] separate_results = search_results.split(";");
-
+            //se nao foi encontrado nada na pesquisa dizemos isso.
             if (separate_results[0].equals("nada"))
                 System.out.println("Nao foi encontrado nada!");
 
             else {
                 int counter = 0;
-
+                //resultados sao mostrados 10 por 10
                 for (int i = 0; i < separate_results.length; i++) {
 
                     counter++;
                     System.out.println(separate_results[i] + "\n");
-
+                    //ja apresentamos 10 resultados perguntamos se quer ver os proximos 10.
                     if (counter == 10) {
                         System.out.println("Deseja ir para a proxima pagina?\n");
                         System.out.println("1 - sim\n2 - nao");
@@ -111,12 +121,14 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
             System.out.println("««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««");
             System.out.println("\n.......................... Estado do sistema: ..............................\n");
 
+            //retira todos os caracteres indesejados e damos print ao texto que queremos
             my_new_str = msg_received[5].replace("{", "");
             my_new_str = my_new_str.replace("}", "");
             my_new_str = my_new_str.replace(",", "");
 
             System.out.println("Numero de Storage Barrels ativos: " + my_new_str);
 
+            //retira todos os caracteres indesejados e damos print ao texto que queremos
             my_new_str = msg_received[6].replace("{", "");
             my_new_str = my_new_str.replace("}", "");
             my_new_str = my_new_str.replace(",", "");
@@ -127,8 +139,9 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
             System.out.println("\n.......................... 10 pesquisas mais realizadas: ....................\n");
             msg_received[7] = msg_received[7].replace(";", "");
 
+            //damos print as 10 escolhas mais realizadas, se nao houver 10 vamos ate a quantas houver.S
             for (continuacao = 7; continuacao < msg_received.length; continuacao++) {
-
+                //retira todos os caracteres indesejados e damos print ao texto que queremos
                 my_new_str = msg_received[continuacao].replace("{", "");
                 my_new_str = my_new_str.replace("}", "");
                 my_new_str = my_new_str.replace(",", "");
@@ -142,6 +155,9 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
     }
 
+    /**
+     * usado para verificar se o cliente esta ativo ou nao. Devolve exececao se nao estiver ativo
+     */
     public void ping(){
 
     }
@@ -195,7 +211,8 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     }
 
     /**
-     * Inicia conexao com servidor e pergunta ao cliente o que ele deseja fazer, realiza diferentes operacoes tendo em conta a escolha do cliente
+     * Inicia conexao com o servidor e depois pergunta ao cliente que tipo de operacao deseja realizar, as operacoes sao apresentadas como menu ao cliente
+     * @param args argumentos da consola
      */
     public static void main(String[] args) {
 

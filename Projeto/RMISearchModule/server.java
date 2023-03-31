@@ -41,11 +41,13 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
         clients = new ArrayList<Hello_C_I>();
     }
 
+
     /**
-     * Realiza as diferentes funcoes tendo em conta a mensagem recevida.
+     * Realiza diferentes funcionalidades tendo em conta a string recebida pelo cliente
+     * @param s funcao a realizar
+     * @param c cliente que pediu para realizar a funcao
+     * @throws RemoteException
      */
-
-
     public void print_on_server(String s, Hello_C_I c) throws RemoteException {
 
         String[] received_string = s.split(" ", 0);
@@ -211,19 +213,36 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     }
 
+    /**
+     * Adiciona o cliente que chamou a funcao na lista de clientes.
+     * @param name
+     * @param c
+     * @throws RemoteException
+     */
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Subscribing " + name);
         System.out.print("> ");
         clients.add(c);
     }
 
+    /**
+     * sempre que e chamada retira o cliente da lista de clientes.
+     * @param name
+     * @param c
+     * @throws RemoteException
+     */
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
         clients.remove(c);
     }
 
-
+    /**
+     * Sempre que um dowloader se connecta adiciona o downloader a lista de downloaders.
+     * @param s
+     * @param c
+     * @throws RemoteException
+     */
     public void downloader_subscribe(String s,Hello_C_I c) throws RemoteException {
         synchronized (downloaders) {
             downloaders.add(c);

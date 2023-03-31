@@ -15,12 +15,12 @@ public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barr
      * Inicia os dois RMISearchModule.server necessarios, o que espera do search module e o dos barrels.
      * @throws RemoteException
      */
-    public Storage_Barrels() throws IOException, SQLException {
+    public Storage_Barrels(int nBarrel) throws IOException, SQLException {
 
         super();
-        sMUL = new Storage_Barrels_Multicast();
+        sMUL = new Storage_Barrels_Multicast(nBarrel);
         t1 = new Thread(sMUL);
-        sRMI = new Storage_Barrels_RMI();
+        sRMI = new Storage_Barrels_RMI(nBarrel);
         t2 = new Thread(sRMI);
         t1.start();
         t2.start();
@@ -30,7 +30,7 @@ public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barr
     public static void main(String[] args)
     {
         try{
-            Storage_Barrels s = new Storage_Barrels();
+            Storage_Barrels s = new Storage_Barrels(Integer.parseInt(args[0]));
         }
         catch(Exception re){
 

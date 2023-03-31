@@ -13,27 +13,36 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
     public static Hello_S_I h;
     public static Storage_Barrels_RMI c;
+    private int nBarrel;
 
-    public Storage_Barrels_RMI() throws RemoteException {
+    public Storage_Barrels_RMI(int nBarrel) throws RemoteException {
         super();
+        this.nBarrel = nBarrel;
     }
 
     /**
-     * Realiza diferentes operacoes tendo em conta mensagem recevida pelo servidor
+     * Realiza uma pesquisa tendo em conta a string recevida, consegue realizar dois tipos de pesquisa diferente
+     * @param s string recevida
+     * @throws RemoteException
      */
     public void print_on_client(String s) throws RemoteException {
 
         //tipo de search
-
+        System.out.println(("aaaaa"));
         String[] pesquisa = s.split(",");
         System.out.println(Arrays.toString(pesquisa));
         //todos os URLS em que aparece o primeiro termo.
         ArrayList<String> rowValuesFinal = new ArrayList<String>();
         ArrayList<String> resultList = new ArrayList<String>();
-
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         if (pesquisa[0].equals("search;")) {
             try {
-                Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
+                String db = "jdbc:postgresql://localhost:5432/db"+nBarrel;
+                Connection con = DriverManager.getConnection(db, "test", "test");
                 con.setAutoCommit(false);
                 PreparedStatement pre_stmt;
                 ResultSet rs;
@@ -189,7 +198,10 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
     }
 
-    public void ping(){
+    /**
+     * E chamado para ver se esta ativo ou nao, devolve Remote exception se nao estiver ativo.
+     */
+    public void ping() throws  java.rmi.RemoteException{
 
     }
 
@@ -201,7 +213,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
         try {
 
-            c = new Storage_Barrels_RMI();
+            c = new Storage_Barrels_RMI(nBarrel);
             int retry = 0;
 
             while(true) {

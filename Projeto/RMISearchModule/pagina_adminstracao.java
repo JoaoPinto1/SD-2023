@@ -22,6 +22,11 @@ public class pagina_adminstracao implements Runnable {
         this.downloaders = downloaders;
     }
 
+    /**
+     * Recebe lista com pesquisas e devolve as 10 pesquisas mais realizadas.
+     * @param arr
+     * @return lista com as 10 pesquisas mais realizadas.
+     */
     public static LinkedHashMap<String, String> top10(List<String> arr) {
         // Count the occurrences of each element in the list
         Map<String, Integer> counts = new HashMap<>();
@@ -42,7 +47,11 @@ public class pagina_adminstracao implements Runnable {
         // Return the map of the top 10 elements and their counts as strings
         return top10;
     }
-
+    /**
+     * Remove os Storage Barrels que nao estao ativos.
+     * Recebe como parametro os barrels nao ativos.
+     * @param removedBarrels
+     */
     private void RemoveBarrels(List<Hello_C_I> removedBarrels){
         synchronized (storage_barrels) {
             for (Hello_C_I s : removedBarrels) {
@@ -51,6 +60,11 @@ public class pagina_adminstracao implements Runnable {
         }
     }
 
+    /**
+     * Remove os downloaders que nao estao ativos.
+     * Recebe como parametro os downloaders nao ativos.
+     * @param removedDownloader
+     */
     private void RemoveDownloader(List<Hello_C_I> removedDownloader){
         synchronized (downloaders) {
             for (Hello_C_I s : removedDownloader) {
@@ -59,6 +73,10 @@ public class pagina_adminstracao implements Runnable {
         }
     }
 
+    /**
+     *Verifica os Downloaders para ver se estao ativos
+     * Se o downloader nao estiver ativo removemos da lista.
+     */
     private void check_downloaders(){
 
         List<Hello_C_I> removed_downloaders = new ArrayList<>();
@@ -77,7 +95,10 @@ public class pagina_adminstracao implements Runnable {
         }
     }
 
-
+    /**
+     *Verifica os storage barrels para ver se estao ativos
+     * Se o storage barrel nao estiver ativo removemos da lista.
+     * */
     private void check_storage_barrels(){
 
         List<Hello_C_I> removed_barrels = new ArrayList<>();

@@ -28,14 +28,30 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         this.clients_RMI = storage_barrels;
     }
 
+    /**
+     * da print a string.
+     * @param s string recebida
+     * @throws RemoteException
+     */
     public void print_on_client(String s) throws RemoteException {
         System.out.println(s);
     }
 
+    /**
+     * nao realiza nada neste server.
+     * @param s
+     * @param client
+     */
     public void downloader_subscribe(String s,Hello_C_I client){
 
     }
 
+    /**
+     * quando chamado significa que vai receber resultados da pesquisa realizada, guarda resultados num array e avisa que foi realizada uma pesquisa
+     * @param s pesquisa realizada
+     * @param c cliente que realizou a pesquisa
+     * @throws RemoteException
+     */
     public void print_on_server(String s, Hello_C_I c) throws RemoteException {
 
         System.out.println("RMISearchModule.serverb " + s);
@@ -46,10 +62,21 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         }
 
     }
-    public void ping(){
+
+    /**
+     * Recebe a chamada e devolve Remote execption se nao estiver ativo
+     * @throws java.rmi.RemoteException
+     */
+    public void ping() throws  java.rmi.RemoteException{
 
     }
 
+    /**
+     * Adiciona o cliente ao array de clientes
+     * @param name nome do cliente
+     * @param c cliente
+     * @throws RemoteException
+     */
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
 
         System.out.println("Subscribing " + name);
@@ -62,6 +89,12 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         }
     }
 
+    /**
+     * sempre que e chamada retira o cliente da lista de clientes.
+     * @param name nome do cliente
+     * @param c cliente
+     * @throws RemoteException
+     */
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
         System.out.print("> ");
@@ -73,6 +106,10 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         }
     }
 
+    /**
+     * escolhe um cliente random da lista de clientes
+     * @return devolve um cliente random que foi escolhido
+     */
     private Hello_C_I RandomClient() {
         synchronized (h.clients_RMI) {
 
