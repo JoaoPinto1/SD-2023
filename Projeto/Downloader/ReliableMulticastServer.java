@@ -82,7 +82,6 @@ public class ReliableMulticastServer extends Thread implements Runnable {
                         byte[] data = "NACK".getBytes();
                         DatagramPacket new_new_packet = new DatagramPacket(data, data.length, group, PORT);
                         new_new_packet.setData(encodePacketData(i, messagesSent.get(i)));
-                        Thread.sleep(250);
                         socket.send(new_new_packet);
                         //envia pacotes perdidos
                         System.out.println("--->" + messagesSent.get(i));

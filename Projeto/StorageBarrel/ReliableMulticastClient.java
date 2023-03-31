@@ -66,8 +66,14 @@ public class ReliableMulticastClient{
         if (!expectedSeqNumbers.containsKey(nDownloader)) {
             expectedSeqNumbers.put(nDownloader, 0);
         } else {
-            expectedPacket = expectedSeqNumbers.get(nDownloader) + 1;
-            expectedSeqNumbers.replace(nDownloader, expectedPacket);
+            int previous_packet = expectedSeqNumbers.get(nDownloader);
+            if(previous_packet < seqNum){
+                expectedPacket = expectedSeqNumbers.get(nDownloader) + 1;
+                expectedSeqNumbers.replace(nDownloader, expectedPacket);
+            }
+            else{
+                return 0;
+            }
         }
         if (expectedPacket == seqNum) {
             insertDB(decodePacketMessage(packet.getData()));
