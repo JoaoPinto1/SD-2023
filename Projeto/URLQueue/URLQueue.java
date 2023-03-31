@@ -13,7 +13,7 @@ public class URLQueue {
     private final Queue<URLObject> queue;  //fila
 
     /**
-     * Construtor da fila de URLs que é uma Lista ligada
+     * Construtor da fila de URLs que e uma Lista ligada
      *
      */
     public URLQueue(){
@@ -29,8 +29,8 @@ public class URLQueue {
     }
 
     /**
-     * Se a fila está vazia
-     * @return True se vazia, False caso contrário
+     * Se a fila esta vazia
+     * @return True se vazia, False caso contrario
      */
     public boolean isEmpty(){
         return getQueue().isEmpty();

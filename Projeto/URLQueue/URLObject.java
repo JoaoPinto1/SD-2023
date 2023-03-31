@@ -11,8 +11,8 @@ public class URLObject implements Serializable {
     private String title;
 
     /**
-     * Getter da citação do website
-     * @return Citação
+     * Getter da citacao do website
+     * @return Citacao
      */
     public String getCitation() {
         return citation;
@@ -27,8 +27,8 @@ public class URLObject implements Serializable {
     }
 
     /**
-     * Setter da citação do website
-     * @param citation Citação
+     * Setter da citacao do website
+     * @param citation Citacao
      */
     public void setCitation(String citation) {
         this.citation = citation;

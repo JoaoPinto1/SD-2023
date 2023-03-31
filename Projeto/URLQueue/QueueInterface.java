@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
  */
 public interface QueueInterface extends Remote {
     /**
-     * Adiciona um URL à Queue
+     * Adiciona um URL a Queue
      * @param url URL a adicionar
      * @throws Exception No caso de algum erro
      */
@@ -17,15 +17,15 @@ public interface QueueInterface extends Remote {
     /**
      * Remove URL da queue
      * @return URL
-     * @throws RemoteException Ocorrência de Erro no RMI
-     * @throws InterruptedException Ocorrência de Erro no wait()
+     * @throws RemoteException Ocorrencia de Erro no RMI
+     * @throws InterruptedException Ocorrencia de Erro no wait()
      */
     URLObject removeFromQueue() throws RemoteException, InterruptedException;
 
     /**
-     * Se a queue está vazia
-     * @return True se estiver vazia, caso contrário False
-     * @throws RemoteException Conexão RMI
+     * Se a queue esta vazia
+     * @return True se estiver vazia, caso contrario False
+     * @throws RemoteException Conexao RMI
      */
     boolean isQueueEmpty() throws RemoteException;
 }

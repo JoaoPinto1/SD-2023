@@ -4,12 +4,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 /**
- * Classe de criação da Queue de URLs. è criado um registo RMI para essa Queue
+ * Classe de criacao da Queue de URLs. E criado um registo RMI para essa Queue
  */
 public class URLQueueMain {
     /**
-     * Método main para a UrlQueue
-     * @param args Argumentos não necessários
+     * Metodo main para a UrlQueue
+     * @param args Argumentos nao necessarios
      */
     public static void main(String[] args) {
         try {

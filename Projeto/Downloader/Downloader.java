@@ -38,9 +38,9 @@ public class Downloader extends Thread implements Serializable {
     }
 
     /**
-     * Método main da Class Downloader
+     * Metodo main da Class Downloader
      * @param args Identificador do Downloader
-     * @throws Exception Exceções encontradas
+     * @throws Exception Excecoes encontradas
      */
     public static void main(String[] args) throws Exception{
         Downloader server = new Downloader(Integer.parseInt(args[0]));
