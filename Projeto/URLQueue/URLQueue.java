@@ -6,22 +6,32 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Classe da Fila URL
+ */
 public class URLQueue {
     private final Queue<URLObject> queue;  //fila
 
     /**
-     * Construtor de uma fila FIFO
+     * Construtor da fila de URLs que e uma Lista ligada
      *
      */
     public URLQueue(){
         this.queue = new LinkedList<>();
     }
 
-
+    /**
+     * Getter da fila
+     * @return Fila URLs
+     */
     public Queue<URLObject> getQueue() {
         return queue;
     }
 
+    /**
+     * Se a fila esta vazia
+     * @return True se vazia, False caso contrario
+     */
     public boolean isEmpty(){
         return getQueue().isEmpty();
     }

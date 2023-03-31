@@ -1,13 +1,17 @@
 package URLQueue;
 
-import java.rmi.RemoteException;
-import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * Classe de criacao da Queue de URLs. E criado um registo RMI para essa Queue
+ */
 public class URLQueueMain {
-    public static void main(String[] args) throws RemoteException {
+    /**
+     * Metodo main para a UrlQueue
+     * @param args Argumentos nao necessarios
+     */
+    public static void main(String[] args) {
         try {
             Registry r = LocateRegistry.createRegistry(6000);
             URLQueueServer server = new URLQueueServer();

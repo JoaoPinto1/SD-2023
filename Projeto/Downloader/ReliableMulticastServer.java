@@ -2,13 +2,10 @@ package Downloader;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static java.lang.Thread.sleep;
-
 /**
- * Classe onde se encontra todos os métodos para a implementação do multicast da parte dos Downloaders
+ * Classe onde se encontra todos os metodos para a implementacao do multicast da parte dos Downloaders
  */
 public class ReliableMulticastServer extends Thread implements Runnable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
@@ -23,7 +20,7 @@ public class ReliableMulticastServer extends Thread implements Runnable {
 
     /**
      * Construtor da Classe de Multicast utilizado pelos Downloaders.
-     * Cria um servidor de multicast confiável que usa NACK com retransmissão de pacotes perdidos para garantir a entrega confiável
+     * Cria um servidor de multicast confiavel que usa NACK com retransmissao de pacotes perdidos para garantir a entrega confiavel
      *
      * @param n Identificador do Downloader
      */
@@ -43,7 +40,7 @@ public class ReliableMulticastServer extends Thread implements Runnable {
     }
 
     /**
-     * Método de envio de mensagens multicast para os Barrels
+     * Metodo de envio de mensagens multicast para os Barrels
      * @param message Mensagem a ser enviada
      * @throws IOException Se ocorrer um erro de IO ao enviar a mensagem
      */
@@ -63,10 +60,10 @@ public class ReliableMulticastServer extends Thread implements Runnable {
     }
 
     /**
-     * Método utilizado na Thread em modo de escuta para o caso de receção de NACKs, retransmite os pacotes perdidos pelo
-     * Barrel em questão e espera a receção dos ACKs desses mesmos pacotes
+     * Metodo utilizado na Thread em modo de escuta para o caso de rececao de NACKs, retransmite os pacotes perdidos pelo
+     * Barrel em questao e espera a rececao dos ACKs desses mesmos pacotes
      * @throws IOException Se ocorrer um erro de IO ao receber os pacotes
-     * @throws InterruptedException Se a thread for interrompida enquanto estiver a aguardar a recepção de pacotes
+     * @throws InterruptedException Se a thread for interrompida enquanto estiver a aguardar a rececao de pacotes
      */
     private void receiveACKorNACK() throws IOException, InterruptedException {
         String[] message;
@@ -106,9 +103,9 @@ public class ReliableMulticastServer extends Thread implements Runnable {
 
 
     /**
-     * Responsável por codificar o número de sequência da mensagem e o próprio conteúdo da mensagem em um array de bytes,
+     * Responsavel por codificar o numero de sequencia da mensagem e o proprio conteudo da mensagem em um array de bytes,
      *  para que possa ser enviado como um pacote de dados.
-     * @param sequenceNumber Numero de sequência do pacote
+     * @param sequenceNumber Numero de sequencia do pacote
      * @param message Mensagem a enviar
      * @return Mensagem codificada em byte[] pronta a enviar
      */
