@@ -23,7 +23,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
     /**
      * Realiza uma pesquisa tendo em conta a string recevida, consegue realizar dois tipos de pesquisa diferente
      * @param s string recevida
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void print_on_client(String s) throws RemoteException {
 

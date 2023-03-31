@@ -31,7 +31,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     /**
      * da print a string.
      * @param s string recebida
-     * @throws RemoteException
+     * @throws RemoteException quando e acedido e nao responde
      */
     public void print_on_client(String s) throws RemoteException {
         System.out.println(s);
@@ -39,8 +39,8 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * nao realiza nada neste server.
-     * @param s
-     * @param client
+     * @param s string recevida
+     * @param client cliente que chamou
      */
     public void downloader_subscribe(String s,Hello_C_I client){
 
@@ -50,7 +50,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
      * quando chamado significa que vai receber resultados da pesquisa realizada, guarda resultados num array e avisa que foi realizada uma pesquisa
      * @param s pesquisa realizada
      * @param c cliente que realizou a pesquisa
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void print_on_server(String s, Hello_C_I c) throws RemoteException {
 
@@ -65,7 +65,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * Recebe a chamada e devolve Remote execption se nao estiver ativo
-     * @throws java.rmi.RemoteException
+     * @throws java.rmi.RemoteException quando e chamado e nao responde
      */
     public void ping() throws  java.rmi.RemoteException{
 
@@ -75,7 +75,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
      * Adiciona o cliente ao array de clientes
      * @param name nome do cliente
      * @param c cliente
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
 
@@ -93,7 +93,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
      * sempre que e chamada retira o cliente da lista de clientes.
      * @param name nome do cliente
      * @param c cliente
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);

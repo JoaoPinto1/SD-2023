@@ -17,7 +17,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     /**
      * Realiza diferentes operacoes tendo em conta a string recevida
      * @param s string recevida
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void print_on_client(String s) throws RemoteException {
 

@@ -46,7 +46,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
      * Realiza diferentes funcionalidades tendo em conta a string recebida pelo cliente
      * @param s funcao a realizar
      * @param c cliente que pediu para realizar a funcao
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void print_on_server(String s, Hello_C_I c) throws RemoteException {
 
@@ -215,9 +215,9 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * Adiciona o cliente que chamou a funcao na lista de clientes.
-     * @param name
-     * @param c
-     * @throws RemoteException
+     * @param name nome do cliente
+     * @param c cliente que chamou funcao
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Subscribing " + name);
@@ -227,9 +227,9 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * sempre que e chamada retira o cliente da lista de clientes.
-     * @param name
-     * @param c
-     * @throws RemoteException
+     * @param name nome cliente
+     * @param c cliente que chamou funcao
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
         System.out.println("Unsubscribing " + name);
@@ -239,9 +239,9 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * Sempre que um dowloader se connecta adiciona o downloader a lista de downloaders.
-     * @param s
-     * @param c
-     * @throws RemoteException
+     * @param s string recevida
+     * @param c cliente que chamou funcao
+     * @throws RemoteException quando e chamado e nao responde
      */
     public void downloader_subscribe(String s,Hello_C_I c) throws RemoteException {
         synchronized (downloaders) {

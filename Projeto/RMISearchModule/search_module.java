@@ -22,7 +22,7 @@ public class search_module extends UnicastRemoteObject implements Search_Module_
     /**
      * Inicia os dois RMISearchModule.server necessarios, o dos clientes e o dos barrels.
      *
-     * @throws RemoteException
+     * @throws RemoteException quando e chamado e nao responde
      */
     public search_module() throws RemoteException {
 

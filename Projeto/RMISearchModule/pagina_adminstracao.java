@@ -24,7 +24,7 @@ public class pagina_adminstracao implements Runnable {
 
     /**
      * Recebe lista com pesquisas e devolve as 10 pesquisas mais realizadas.
-     * @param arr
+     * @param arr array com as pesquisas realizadas
      * @return lista com as 10 pesquisas mais realizadas.
      */
     public static LinkedHashMap<String, String> top10(List<String> arr) {
@@ -50,7 +50,7 @@ public class pagina_adminstracao implements Runnable {
     /**
      * Remove os Storage Barrels que nao estao ativos.
      * Recebe como parametro os barrels nao ativos.
-     * @param removedBarrels
+     * @param removedBarrels array com os barrels nao ativos
      */
     private void RemoveBarrels(List<Hello_C_I> removedBarrels){
         synchronized (storage_barrels) {
@@ -63,7 +63,7 @@ public class pagina_adminstracao implements Runnable {
     /**
      * Remove os downloaders que nao estao ativos.
      * Recebe como parametro os downloaders nao ativos.
-     * @param removedDownloader
+     * @param removedDownloader array com os downloaders nao ativos
      */
     private void RemoveDownloader(List<Hello_C_I> removedDownloader){
         synchronized (downloaders) {
