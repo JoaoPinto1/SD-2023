@@ -20,7 +20,13 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public final List<String> results;
     public final List<String> searchs;
 
-
+    /**
+     *
+     * @param Result resultados obtidos das pesquisas
+     * @param Searchs o que foi pesquisado
+     * @param storage_barrels array de storage_barrels
+     * @throws RemoteException quando e chamada e nao responde
+     */
     public serverb(List<String> Result ,List<String> Searchs,ArrayList<Hello_C_I>storage_barrels) throws RemoteException {
         super();
         this.results = Result;
@@ -128,6 +134,8 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     // =======================================================
     @Override
     public void run() {
+        int retry = 0;
+
         try {
 
             h = new serverb(results , searchs , clients_RMI);
@@ -141,7 +149,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
         }
 
         while (true) {
-
+            retry = 0;
             synchronized (results) {
                 while (results.isEmpty()) {
                     try {
@@ -204,7 +212,12 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                         client = RandomClient();
 
                         while (client == null) {
-
+                            retry++;
+                            if(retry == 20){
+                                results.add("nada");
+                                results.notify();
+                                break;
+                            }
                             try {
                                 System.out.println("looking for new barrel ...");
                                 Thread.sleep(1000);
@@ -213,6 +226,10 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                             }
                             client = RandomClient();
 
+                        }
+
+                        if(retry == 20){
+                            break;
                         }
                     }
 

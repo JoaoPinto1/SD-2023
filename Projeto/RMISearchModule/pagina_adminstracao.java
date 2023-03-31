@@ -14,6 +14,13 @@ public class pagina_adminstracao implements Runnable {
     public ArrayList<Hello_C_I> downloaders;
     public Map<String, String> top_searchs;
 
+    /**
+     *
+     * @param searchs pesquisas realizadas
+     * @param storage_barrels lista de storage barrels
+     * @param tsearchs 10 pesquisas mais realizadas
+     * @param downloaders lista de downloaders
+     */
     public pagina_adminstracao(List<String> searchs, ArrayList<Hello_C_I> storage_barrels , Map<String, String> tsearchs , ArrayList<Hello_C_I> downloaders) {
         super();
         this.searchs = searchs;

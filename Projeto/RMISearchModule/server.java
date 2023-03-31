@@ -30,7 +30,15 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
     public ArrayList<Hello_C_I> downloaders;
 
 
-
+    /**
+     * 
+     * @param Result resultado obtidos nas pesquisas
+     * @param Searchs pesquisas realizadas
+     * @param tsearchs 10 pesquisas mais realizadas
+     * @param storage_barrels lista de storage barrels
+     * @param downloaders lista de downloaders
+     * @throws RemoteException
+     */
     public server(List<String> Result, List<String> Searchs, Map<String, String> tsearchs, ArrayList<Hello_C_I> storage_barrels , ArrayList<Hello_C_I> downloaders) throws RemoteException {
         super();
         this.results = Result;
