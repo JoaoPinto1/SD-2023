@@ -10,7 +10,11 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
     static boolean logged_in = false;
 
-    Interface() throws RemoteException {
+    /**
+     * Contrutror Interface
+     * @throws RemoteException Erro no RMI
+     */
+     public Interface() throws RemoteException {
         super();
     }
 

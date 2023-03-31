@@ -6,7 +6,9 @@ import java.rmi.server.*;
 import java.rmi.*;
 import java.util.*;
 
-
+/**
+ * Classe search_module
+ */
 public class search_module extends UnicastRemoteObject implements Search_Module_Remote {
 
     private Thread t1, t2;

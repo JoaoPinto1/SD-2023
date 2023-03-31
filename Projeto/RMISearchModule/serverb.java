@@ -12,7 +12,9 @@ import Downloader.Downloader;
 import RMIClient.Hello_C_I;
 import RMIClient.Hello_S_I;
 
-
+/**
+ * Classe do ServerB
+ */
 public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I, Runnable {
 
     public final ArrayList<Hello_C_I> clients_RMI;
