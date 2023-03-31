@@ -12,14 +12,16 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
     /**
      * Contrutror Interface
+     *
      * @throws RemoteException Erro no RMI
      */
-     public Interface() throws RemoteException {
+    public Interface() throws RemoteException {
         super();
     }
 
     /**
      * Realiza diferentes operacoes tendo em conta a string recevida
+     *
      * @param s string recevida
      * @throws RemoteException quando e chamado e nao responde
      */
@@ -166,7 +168,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     /**
      * Usado para verificar se o cliente esta ativo ou nao. Devolve exececao se nao estiver ativo
      */
-    public void ping(){
+    public void ping() {
 
     }
 
@@ -220,6 +222,7 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
     /**
      * Inicia conexao com o servidor e depois pergunta ao cliente que tipo de operacao deseja realizar, as operacoes sao apresentadas como menu ao cliente
+     *
      * @param args argumentos da consola
      */
     public static void main(String[] args) {

@@ -14,14 +14,14 @@ public class URLQueue {
 
     /**
      * Construtor da fila de URLs que e uma Lista ligada
-     *
      */
-    public URLQueue(){
+    public URLQueue() {
         this.queue = new LinkedList<>();
     }
 
     /**
      * Getter da fila
+     *
      * @return Fila URLs
      */
     public Queue<URLObject> getQueue() {
@@ -30,9 +30,10 @@ public class URLQueue {
 
     /**
      * Se a fila esta vazia
+     *
      * @return True se vazia, False caso contrario
      */
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return getQueue().isEmpty();
     }
 
@@ -41,7 +42,7 @@ public class URLQueue {
      *
      * @param url url a ser inserido
      */
-    public void add(URLObject url){
+    public void add(URLObject url) {
         getQueue().add(url);
     }
 

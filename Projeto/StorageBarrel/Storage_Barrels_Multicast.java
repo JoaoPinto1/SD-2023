@@ -13,6 +13,7 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
 
     /**
      * Contrutor da Class Storage_Barrels_Multicast
+     *
      * @param nBarrel Identificação do Barrel
      */
     public Storage_Barrels_Multicast(int nBarrel) {
@@ -27,8 +28,8 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
             while (true) {
                 DatagramPacket packet = multicast.receive();
                 String[] message = new String(packet.getData()).trim().split("--");
-                if (!message[0].equals("ACK")){
-                    if(Integer.parseInt(message[0])>-1) {
+                if (!message[0].equals("ACK")) {
+                    if (Integer.parseInt(message[0]) > -1) {
                         //ignora todos os ACKs e NACKs
                         int nDownloader = multicast.decodeDownloaderNumber(packet.getData());
                         int num = multicast.checkPacket(packet, nDownloader);

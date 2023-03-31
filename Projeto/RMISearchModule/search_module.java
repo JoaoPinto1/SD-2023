@@ -30,12 +30,12 @@ public class search_module extends UnicastRemoteObject implements Search_Module_
         super();
         results = new ArrayList<String>();
         searchs = new ArrayList<String>();
-        top_searchs = new HashMap<String , String>();
+        top_searchs = new HashMap<String, String>();
         storage_barrels = new ArrayList<Hello_C_I>();
         downloaders = new ArrayList<Hello_C_I>();
-        sb = new serverb(results , searchs  , storage_barrels);
+        sb = new serverb(results, searchs, storage_barrels);
         t1 = new Thread(sb);
-        sc = new server(results , searchs  , top_searchs , storage_barrels , downloaders);
+        sc = new server(results, searchs, top_searchs, storage_barrels, downloaders);
         t2 = new Thread(sc);
         t1.start();
         t2.start();

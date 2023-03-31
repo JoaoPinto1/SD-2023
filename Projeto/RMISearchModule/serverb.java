@@ -23,13 +23,12 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
     public final List<String> searchs;
 
     /**
-     *
-     * @param Result resultados obtidos das pesquisas
-     * @param Searchs o que foi pesquisado
+     * @param Result          resultados obtidos das pesquisas
+     * @param Searchs         o que foi pesquisado
      * @param storage_barrels array de storage_barrels
      * @throws RemoteException quando e chamada e nao responde
      */
-    public serverb(List<String> Result ,List<String> Searchs,ArrayList<Hello_C_I>storage_barrels) throws RemoteException {
+    public serverb(List<String> Result, List<String> Searchs, ArrayList<Hello_C_I> storage_barrels) throws RemoteException {
         super();
         this.results = Result;
         this.searchs = Searchs;
@@ -38,6 +37,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * da print a string.
+     *
      * @param s string recebida
      * @throws RemoteException quando e acedido e nao responde
      */
@@ -47,15 +47,17 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * nao realiza nada neste server.
-     * @param s string recevida
+     *
+     * @param s      string recevida
      * @param client cliente que chamou
      */
-    public void downloader_subscribe(String s,Hello_C_I client){
+    public void downloader_subscribe(String s, Hello_C_I client) {
 
     }
 
     /**
      * quando chamado significa que vai receber resultados da pesquisa realizada, guarda resultados num array e avisa que foi realizada uma pesquisa
+     *
      * @param s pesquisa realizada
      * @param c cliente que realizou a pesquisa
      * @throws RemoteException quando e chamado e nao responde
@@ -73,16 +75,18 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * Recebe a chamada e devolve Remote execption se nao estiver ativo
+     *
      * @throws java.rmi.RemoteException quando e chamado e nao responde
      */
-    public void ping() throws  java.rmi.RemoteException{
+    public void ping() throws java.rmi.RemoteException {
 
     }
 
     /**
      * Adiciona o cliente ao array de clientes
+     *
      * @param name nome do cliente
-     * @param c cliente
+     * @param c    cliente
      * @throws RemoteException quando e chamado e nao responde
      */
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
@@ -99,8 +103,9 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * sempre que e chamada retira o cliente da lista de clientes.
+     *
      * @param name nome do cliente
-     * @param c cliente
+     * @param c    cliente
      * @throws RemoteException quando e chamado e nao responde
      */
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
@@ -116,6 +121,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
     /**
      * escolhe um cliente random da lista de clientes
+     *
      * @return devolve um cliente random que foi escolhido
      */
     private Hello_C_I RandomClient() {
@@ -140,7 +146,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
         try {
 
-            h = new serverb(results , searchs , clients_RMI);
+            h = new serverb(results, searchs, clients_RMI);
 
             Registry r = LocateRegistry.createRegistry(7001);
             r.rebind("XPT", h);
@@ -184,7 +190,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                             results.notify();
                         }
 
-                        synchronized (searchs){
+                        synchronized (searchs) {
                             searchs.wait();
                         }
 
@@ -219,7 +225,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                                     clients_RMI.notifyAll();
                                 }
 
-                            }catch(RemoteException e){
+                            } catch (RemoteException e) {
                                 System.out.println("Storage Barrel disconetou a meio da pesquisa.");
 
                                 synchronized (results) {
@@ -227,7 +233,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                                     results.notify();
                                 }
 
-                                synchronized (searchs){
+                                synchronized (searchs) {
                                     searchs.wait();
                                 }
                             }
@@ -256,7 +262,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                                         results.notify();
                                     }
 
-                                    synchronized (searchs){
+                                    synchronized (searchs) {
                                         searchs.wait();
                                     }
 

@@ -1,4 +1,5 @@
 package StorageBarrel;
+
 import java.io.IOException;
 import java.rmi.server.*;
 import java.rmi.*;
@@ -10,12 +11,13 @@ import java.sql.SQLException;
  */
 public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barrels_Remote {
 
-    private Thread t1,t2;
+    private Thread t1, t2;
     private Storage_Barrels_RMI sRMI;
     private Storage_Barrels_Multicast sMUL;
 
     /**
      * Inicia os dois RMISearchModule.server necessarios, o que espera do search module e o dos barrels.
+     *
      * @param nBarrel Identificacao do Barrel
      * @throws IOException Se ocorrer um erro de IO ao enviar a mensagem
      */
@@ -32,14 +34,13 @@ public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barr
 
     /**
      * Metodo main da Classe Storage_Barrels
+     *
      * @param args Identificador do Barrel
      */
-    public static void main(String[] args)
-    {
-        try{
+    public static void main(String[] args) {
+        try {
             Storage_Barrels s = new Storage_Barrels(Integer.parseInt(args[0]));
-        }
-        catch(Exception re){
+        } catch (Exception re) {
 
         }
     }

@@ -22,6 +22,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
     /**
      * Realiza uma pesquisa tendo em conta a string recevida, consegue realizar dois tipos de pesquisa diferente
+     *
      * @param s string recevida
      * @throws RemoteException quando e chamado e nao responde
      */
@@ -36,7 +37,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
         if (pesquisa[0].equals("search;")) {
             try {
-                String db = "jdbc:postgresql://localhost:5432/db"+nBarrel;
+                String db = "jdbc:postgresql://localhost:5432/db" + nBarrel;
                 Connection con = DriverManager.getConnection(db, "test", "test");
                 con.setAutoCommit(false);
                 PreparedStatement pre_stmt;
@@ -196,7 +197,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
     /**
      * E chamado para ver se esta ativo ou nao, devolve Remote exception se nao estiver ativo.
      */
-    public void ping() throws  java.rmi.RemoteException{
+    public void ping() throws java.rmi.RemoteException {
 
     }
 
@@ -211,7 +212,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
             c = new Storage_Barrels_RMI(nBarrel);
             int retry = 0;
 
-            while(true) {
+            while (true) {
                 try {
                     h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
                     h.subscribe("StorageBarrel" + ProcessHandle.current().pid(), (Hello_C_I) c);
@@ -229,10 +230,10 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
                         throw new RuntimeException(ex);
                     }
 
-                    try{
+                    try {
                         h = (Hello_S_I) LocateRegistry.getRegistry(7001).lookup("XPT");
                         h.subscribe("StorageBarrel", (Hello_C_I) c);
-                    }catch (ConnectException ignored){
+                    } catch (ConnectException ignored) {
 
                     }
                 }

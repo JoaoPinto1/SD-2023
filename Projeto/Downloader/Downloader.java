@@ -22,15 +22,16 @@ public class Downloader extends Thread implements Serializable {
     private final int PORT = 4321;
     private static final int PACKET_SIZE = 5000;
     private int nDownloader;
-    private static Thread t0,t1;
+    private static Thread t0, t1;
     private static Downloader_RMI drmi;
     private ReliableMulticastServer multicast;
 
     /**
      * Construtor da Classe Downloader para o processamento de páginas Web e envio multicast para Barrels
+     *
      * @param n Identificador do Downloader
      */
-    public Downloader(int n){
+    public Downloader(int n) {
         nDownloader = n;
         multicast = new ReliableMulticastServer(nDownloader);
         t1 = new Thread(multicast);
@@ -39,10 +40,11 @@ public class Downloader extends Thread implements Serializable {
 
     /**
      * Metodo main da Class Downloader
+     *
      * @param args Identificador do Downloader
      * @throws Exception Excecoes encontradas
      */
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         Downloader server = new Downloader(Integer.parseInt(args[0]));
 
         server.start();
@@ -57,7 +59,7 @@ public class Downloader extends Thread implements Serializable {
 
             // create socket without binding it (only for sending)
             QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
-            System.out.println("Downloader "+nDownloader+" Ready!");
+            System.out.println("Downloader " + nDownloader + " Ready!");
             while (true) {
                 try {
                     URLObject url = server.removeFromQueue();
@@ -102,8 +104,7 @@ public class Downloader extends Thread implements Serializable {
                     multicast.send(stringUrls);
                     System.out.println(stringUrls);
                     System.out.println("------------");
-                }
-                catch (IOException | IllegalArgumentException e){
+                } catch (IOException | IllegalArgumentException e) {
                     System.out.println("Erro na procura");
                     continue;
                 }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * Classe para a implementacao do multicast relativo aos Barrels
  */
-public class ReliableMulticastClient{
+public class ReliableMulticastClient {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
     public final MulticastSocket socket;
@@ -22,8 +22,9 @@ public class ReliableMulticastClient{
     /**
      * Contrutor da Classe de multicast relativa aos Barrels. Conecta-se a um grupo multicast e agurda a rececao de mensagens.
      * E capaz de enviar informações ACK e NACK quando necessario. Conecta-se a base de dados especifica ao Barrel
+     *
      * @param nBarrel Identificador do Barrel
-     * @throws IOException Se ocorrer um erro de IO ao enviar a mensagem
+     * @throws IOException  Se ocorrer um erro de IO ao enviar a mensagem
      * @throws SQLException Se ocorrer um erro na insercao da base de dados
      */
     public ReliableMulticastClient(int nBarrel) throws IOException, SQLException {
@@ -40,6 +41,7 @@ public class ReliableMulticastClient{
 
     /**
      * Metodo de rececao de mensagens vindas dos Downloaders
+     *
      * @return Packet recebido
      * @throws IOException Erro ao receber a mensagem
      */
@@ -54,10 +56,11 @@ public class ReliableMulticastClient{
      * Verificacao do packet recebido. Se for o packet esperado insere na base de dados as informacoes recebidas.
      * Se nao for o esperado, envia um NACK com a informacao dos packets que estao em falta e aguarda por eles.
      * Quando recebe um desses packets perdidos, envia um ACK para o Downloader.
-     * @param packet Packet a ser verificado
+     *
+     * @param packet      Packet a ser verificado
      * @param nDownloader Identificacao do Downloader que enviou esse packet
      * @return Auxilio para a terminacao do programa
-     * @throws IOException Se ocorreu algum erro de envio ou rececao de mensagens
+     * @throws IOException  Se ocorreu algum erro de envio ou rececao de mensagens
      * @throws SQLException Se ocorreu algum erro na insercao da base de dados
      */
     public int checkPacket(DatagramPacket packet, int nDownloader) throws IOException, SQLException, ArrayIndexOutOfBoundsException {
@@ -67,19 +70,17 @@ public class ReliableMulticastClient{
             expectedSeqNumbers.put(nDownloader, 0);
         } else {
             int previous_packet = expectedSeqNumbers.get(nDownloader);
-            if(previous_packet < seqNum){
+            if (previous_packet < seqNum) {
                 expectedPacket = expectedSeqNumbers.get(nDownloader) + 1;
                 expectedSeqNumbers.replace(nDownloader, expectedPacket);
-            }
-            else{
+            } else {
                 return 0;
             }
         }
         if (expectedPacket == seqNum) {
             insertDB(decodePacketMessage(packet.getData()));
             return 1;
-        }
-        else if (expectedPacket < seqNum) {
+        } else if (expectedPacket < seqNum) {
             System.out.println("ohoh sending nack");
             sendNACK(expectedPacket, seqNum, nDownloader);
             while (expectedPacket <= seqNum) {
@@ -87,7 +88,7 @@ public class ReliableMulticastClient{
                 DatagramPacket new_packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(new_packet);
                 String[] message = new String(new_packet.getData()).trim().split("--");
-                if(!message[0].equals("ACK") && Integer.parseInt(message[0])>-1) {
+                if (!message[0].equals("ACK") && Integer.parseInt(message[0]) > -1) {
                     if (decodePacketSequenceNumber(new_packet.getData()) == expectedPacket && decodeDownloaderNumber(new_packet.getData()) == nDownloader) {
                         sendACK(nDownloader);
                         insertDB(decodePacketMessage(new_packet.getData()));
@@ -103,6 +104,7 @@ public class ReliableMulticastClient{
 
     /**
      * Envia ACK da rececao do packet perdido ao Downloader em causa
+     *
      * @param nDownloader Identificacao do Downloader a enviar o ACK
      * @throws IOException Se ocorreu algum erro no envio do ACK
      */
@@ -115,20 +117,22 @@ public class ReliableMulticastClient{
 
     /**
      * Envia NACK com a informacao de inicio de perda de informacao ate ao ultimo packet a ser recebido
+     *
      * @param expectedPacket Numero de sequencia de packet esperado pelo Barrel
-     * @param seqNum Numero de sequencia de packet recidido
-     * @param nDownloader Identificacao do Downloader a enviar o NACK
+     * @param seqNum         Numero de sequencia de packet recidido
+     * @param nDownloader    Identificacao do Downloader a enviar o NACK
      * @throws IOException Se ocorreu algum erro no envio do NACK
      */
     private void sendNACK(int expectedPacket, int seqNum, int nDownloader) throws IOException {
         byte[] buffer = String.format(-1 + "--%d--%d--%d", expectedPacket, seqNum, nDownloader).getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
         socket.send(packet);
-        System.out.printf(-1 + "--%d--%d--%d", expectedPacket,seqNum, nDownloader);
+        System.out.printf(-1 + "--%d--%d--%d", expectedPacket, seqNum, nDownloader);
     }
 
     /**
      * Descodificacao do numero de sequencia da mensagem recebida
+     *
      * @param data Mensagem recebida
      * @return Numero de sequencia da mensagem
      */
@@ -139,6 +143,7 @@ public class ReliableMulticastClient{
 
     /**
      * Descodificacao do numero de identificacao do Downloader que enviou a mensagem
+     *
      * @param data Mensagem recebida
      * @return Indentificacao do Downloader
      */
@@ -149,6 +154,7 @@ public class ReliableMulticastClient{
 
     /**
      * Descodificacao da mensagem recebida
+     *
      * @param data Mensagem codificada recebida
      * @return String com o conteudo da mensagem
      */
@@ -159,6 +165,7 @@ public class ReliableMulticastClient{
 
     /**
      * Insercao das informacoes na base de dados.
+     *
      * @param message Mensagem recebida a ser processada para a insercao
      * @throws SQLException Erro na insercao na base de dados
      */

@@ -19,12 +19,13 @@ public class pagina_adminstracao implements Runnable {
 
     /**
      * Contrutor da classe pagina_administracao onde ira ser apresentado todas as informacoes do sistema
-     * @param searchs pesquisas realizadas
+     *
+     * @param searchs         pesquisas realizadas
      * @param storage_barrels lista de storage barrels
-     * @param tsearchs 10 pesquisas mais realizadas
-     * @param downloaders lista de downloaders
+     * @param tsearchs        10 pesquisas mais realizadas
+     * @param downloaders     lista de downloaders
      */
-    public pagina_adminstracao(List<String> searchs, ArrayList<Hello_C_I> storage_barrels , Map<String, String> tsearchs , ArrayList<Hello_C_I> downloaders) {
+    public pagina_adminstracao(List<String> searchs, ArrayList<Hello_C_I> storage_barrels, Map<String, String> tsearchs, ArrayList<Hello_C_I> downloaders) {
         super();
         this.searchs = searchs;
         this.storage_barrels = storage_barrels;
@@ -34,6 +35,7 @@ public class pagina_adminstracao implements Runnable {
 
     /**
      * Recebe lista com pesquisas e devolve as 10 pesquisas mais realizadas.
+     *
      * @param arr array com as pesquisas realizadas
      * @return lista com as 10 pesquisas mais realizadas.
      */
@@ -57,12 +59,14 @@ public class pagina_adminstracao implements Runnable {
         // Return the map of the top 10 elements and their counts as strings
         return top10;
     }
+
     /**
      * Remove os Storage Barrels que nao estao ativos.
      * Recebe como parametro os barrels nao ativos.
+     *
      * @param removedBarrels array com os barrels nao ativos
      */
-    private void RemoveBarrels(List<Hello_C_I> removedBarrels){
+    private void RemoveBarrels(List<Hello_C_I> removedBarrels) {
         synchronized (storage_barrels) {
             for (Hello_C_I s : removedBarrels) {
                 storage_barrels.remove(s);
@@ -73,9 +77,10 @@ public class pagina_adminstracao implements Runnable {
     /**
      * Remove os downloaders que nao estao ativos.
      * Recebe como parametro os downloaders nao ativos.
+     *
      * @param removedDownloader array com os downloaders nao ativos
      */
-    private void RemoveDownloader(List<Hello_C_I> removedDownloader){
+    private void RemoveDownloader(List<Hello_C_I> removedDownloader) {
         synchronized (downloaders) {
             for (Hello_C_I s : removedDownloader) {
                 downloaders.remove(s);
@@ -84,10 +89,10 @@ public class pagina_adminstracao implements Runnable {
     }
 
     /**
-     *Verifica os Downloaders para ver se estao ativos
+     * Verifica os Downloaders para ver se estao ativos
      * Se o downloader nao estiver ativo removemos da lista.
      */
-    private void check_downloaders(){
+    private void check_downloaders() {
 
         List<Hello_C_I> removed_downloaders = new ArrayList<>();
 
@@ -106,10 +111,10 @@ public class pagina_adminstracao implements Runnable {
     }
 
     /**
-     *Verifica os storage barrels para ver se estao ativos
+     * Verifica os storage barrels para ver se estao ativos
      * Se o storage barrel nao estiver ativo removemos da lista.
-     * */
-    private void check_storage_barrels(){
+     */
+    private void check_storage_barrels() {
 
         List<Hello_C_I> removed_barrels = new ArrayList<>();
 

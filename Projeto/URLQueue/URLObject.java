@@ -12,6 +12,7 @@ public class URLObject implements Serializable {
 
     /**
      * Getter da citacao do website
+     *
      * @return Citacao
      */
     public String getCitation() {
@@ -20,6 +21,7 @@ public class URLObject implements Serializable {
 
     /**
      * Getter do titulo do website
+     *
      * @return Titulo
      */
     public String getTitle() {
@@ -28,6 +30,7 @@ public class URLObject implements Serializable {
 
     /**
      * Setter da citacao do website
+     *
      * @param citation Citacao
      */
     public void setCitation(String citation) {
@@ -36,6 +39,7 @@ public class URLObject implements Serializable {
 
     /**
      * Setter titulo do website
+     *
      * @param title Titulo
      */
     public void setTitle(String title) {
@@ -44,6 +48,7 @@ public class URLObject implements Serializable {
 
     /**
      * Construtor do objeto URL
+     *
      * @param url String do url
      */
     public URLObject(String url) {
@@ -52,6 +57,7 @@ public class URLObject implements Serializable {
 
     /**
      * Getter String do url
+     *
      * @return String url
      */
     public String getUrl() {

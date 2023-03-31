@@ -41,6 +41,7 @@ public class ReliableMulticastServer extends Thread implements Runnable {
 
     /**
      * Metodo de envio de mensagens multicast para os Barrels
+     *
      * @param message Mensagem a ser enviada
      * @throws IOException Se ocorrer um erro de IO ao enviar a mensagem
      */
@@ -62,7 +63,8 @@ public class ReliableMulticastServer extends Thread implements Runnable {
     /**
      * Metodo utilizado na Thread em modo de escuta para o caso de rececao de NACKs, retransmite os pacotes perdidos pelo
      * Barrel em questao e espera a rececao dos ACKs desses mesmos pacotes
-     * @throws IOException Se ocorrer um erro de IO ao receber os pacotes
+     *
+     * @throws IOException          Se ocorrer um erro de IO ao receber os pacotes
      * @throws InterruptedException Se a thread for interrompida enquanto estiver a aguardar a rececao de pacotes
      */
     private void receiveACKorNACK() throws IOException, InterruptedException {
@@ -73,7 +75,7 @@ public class ReliableMulticastServer extends Thread implements Runnable {
             socket.receive(packet);
             message = new String(packet.getData()).trim().split("--");
             //ignora ACKs
-            if(!message[0].equals("ACK")) {
+            if (!message[0].equals("ACK")) {
                 //ter a certeza se é para este Downloader utilizando nDownloader
                 if (Integer.parseInt(message[0]) == -1 && Integer.parseInt(message[3]) == nDownloader) {
                     System.out.println("RECEBI UM NACK");
@@ -104,9 +106,10 @@ public class ReliableMulticastServer extends Thread implements Runnable {
 
     /**
      * Responsavel por codificar o numero de sequencia da mensagem e o proprio conteudo da mensagem em um array de bytes,
-     *  para que possa ser enviado como um pacote de dados.
+     * para que possa ser enviado como um pacote de dados.
+     *
      * @param sequenceNumber Numero de sequencia do pacote
-     * @param message Mensagem a enviar
+     * @param message        Mensagem a enviar
      * @return Mensagem codificada em byte[] pronta a enviar
      */
     private byte[] encodePacketData(int sequenceNumber, String message) {

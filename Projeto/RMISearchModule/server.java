@@ -34,15 +34,14 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
 
     /**
-     *
-     * @param Result resultado obtidos nas pesquisas
-     * @param Searchs pesquisas realizadas
-     * @param tsearchs 10 pesquisas mais realizadas
+     * @param Result          resultado obtidos nas pesquisas
+     * @param Searchs         pesquisas realizadas
+     * @param tsearchs        10 pesquisas mais realizadas
      * @param storage_barrels lista de storage barrels
-     * @param downloaders lista de downloaders
+     * @param downloaders     lista de downloaders
      * @throws RemoteException
      */
-    public server(List<String> Result, List<String> Searchs, Map<String, String> tsearchs, ArrayList<Hello_C_I> storage_barrels , ArrayList<Hello_C_I> downloaders) throws RemoteException {
+    public server(List<String> Result, List<String> Searchs, Map<String, String> tsearchs, ArrayList<Hello_C_I> storage_barrels, ArrayList<Hello_C_I> downloaders) throws RemoteException {
         super();
         this.results = Result;
         this.searchs = Searchs;
@@ -55,6 +54,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * Realiza diferentes funcionalidades tendo em conta a string recebida pelo cliente
+     *
      * @param s funcao a realizar
      * @param c cliente que pediu para realizar a funcao
      * @throws RemoteException quando e chamado e nao responde
@@ -123,7 +123,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
                     results.remove(0);
                     System.out.println(results);
 
-                    synchronized (searchs){
+                    synchronized (searchs) {
                         searchs.notifyAll();
                     }
 
@@ -154,7 +154,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
                     String resultados = results.get(0);
                     results.remove(0);
 
-                    synchronized (searchs){
+                    synchronized (searchs) {
                         searchs.notifyAll();
                     }
 
@@ -221,7 +221,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
                     throw new RuntimeException(e);
                 }
                 synchronized (top_searchs) {
-                    String a = "type | status; information | " + storage_barrels.size() + " ;"  + downloaders.size() + " ;" + top_searchs.toString();
+                    String a = "type | status; information | " + storage_barrels.size() + " ;" + downloaders.size() + " ;" + top_searchs.toString();
                     try {
                         c.print_on_client(a);
                     } catch (java.rmi.RemoteException e) {
@@ -236,8 +236,9 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * Adiciona o cliente que chamou a funcao na lista de clientes.
+     *
      * @param name nome do cliente
-     * @param c cliente que chamou funcao
+     * @param c    cliente que chamou funcao
      * @throws RemoteException quando e chamado e nao responde
      */
     public void subscribe(String name, Hello_C_I c) throws RemoteException {
@@ -248,8 +249,9 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * sempre que e chamada retira o cliente da lista de clientes.
+     *
      * @param name nome cliente
-     * @param c cliente que chamou funcao
+     * @param c    cliente que chamou funcao
      * @throws RemoteException quando e chamado e nao responde
      */
     public void unsubscribe(String name, Hello_C_I c) throws RemoteException {
@@ -260,11 +262,12 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
     /**
      * Sempre que um dowloader se connecta adiciona o downloader a lista de downloaders.
+     *
      * @param s string recevida
      * @param c cliente que chamou funcao
      * @throws RemoteException quando e chamado e nao responde
      */
-    public void downloader_subscribe(String s,Hello_C_I c) throws RemoteException {
+    public void downloader_subscribe(String s, Hello_C_I c) throws RemoteException {
         synchronized (downloaders) {
             downloaders.add(c);
         }
@@ -278,11 +281,11 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
         try (Scanner sc = new Scanner(System.in)) {
 
-            h = new server(results, searchs, top_searchs, storage_barrels,downloaders);
+            h = new server(results, searchs, top_searchs, storage_barrels, downloaders);
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("XPTO", h);
             System.out.println("Hello Server ready.");
-            pa = new pagina_adminstracao(searchs, storage_barrels, top_searchs , downloaders);
+            pa = new pagina_adminstracao(searchs, storage_barrels, top_searchs, downloaders);
             t0 = new Thread(pa);
             t0.start();
 
