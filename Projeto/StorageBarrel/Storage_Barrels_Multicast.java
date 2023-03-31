@@ -35,7 +35,6 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
         try {
             ReliableMulticastClient multicast = new ReliableMulticastClient(nBarrel);
             while (true) {
-                System.out.println("Waiting");
                 DatagramPacket packet = multicast.receive();
                 String[] message = new String(packet.getData()).trim().split("--");
                 if (!message[0].equals("ACK")){
@@ -49,7 +48,7 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

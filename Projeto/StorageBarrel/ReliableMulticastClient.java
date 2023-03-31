@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * Classe para a implementacao do multicast relativo aos Barrels
  */
-public class ReliableMulticastClient {
+public class ReliableMulticastClient{
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
     public final MulticastSocket socket;
@@ -60,7 +60,7 @@ public class ReliableMulticastClient {
      * @throws IOException Se ocorreu algum erro de envio ou rececao de mensagens
      * @throws SQLException Se ocorreu algum erro na insercao da base de dados
      */
-    public int checkPacket(DatagramPacket packet, int nDownloader) throws IOException, SQLException {
+    public int checkPacket(DatagramPacket packet, int nDownloader) throws IOException, SQLException, ArrayIndexOutOfBoundsException {
         int seqNum = decodePacketSequenceNumber(packet.getData());
         int expectedPacket = 0;
         if (!expectedSeqNumbers.containsKey(nDownloader)) {
@@ -152,11 +152,11 @@ public class ReliableMulticastClient {
     }
 
     /**
-     * Inserção das informacoes na base de dados.
+     * Insercao das informacoes na base de dados.
      * @param message Mensagem recebida a ser processada para a insercao
      * @throws SQLException Erro na insercao na base de dados
      */
-    private void insertDB(String message) throws SQLException {
+    private void insertDB(String message) throws SQLException, ArrayIndexOutOfBoundsException {
         System.out.println(message);
         String[] split_message = message.split("[|;]+");
         PreparedStatement pre_stmt;

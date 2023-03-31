@@ -57,6 +57,7 @@ public class Downloader extends Thread implements Serializable {
 
             // create socket without binding it (only for sending)
             QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
+            System.out.println("Downloader "+nDownloader+" Ready!");
             while (true) {
                 try {
                     URLObject url = server.removeFromQueue();
