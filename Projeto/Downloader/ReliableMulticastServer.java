@@ -58,21 +58,24 @@ public class ReliableMulticastServer extends Thread implements Runnable {
             socket.receive(packet);
             message = new String(packet.getData()).trim().split("--");
             System.out.println(message[0] + message[1]);
-            if (Integer.parseInt(message[0]) == -1 && Integer.parseInt(message[3]) == nDownloader) {
-                System.out.println("RECEBI UM NACK");
-                for (int i = Integer.parseInt(message[1]); i <= Integer.parseInt(message[2]); i++) {
-                    byte[] data = "NACK".getBytes();
-                    DatagramPacket new_new_packet = new DatagramPacket(data, data.length, group, PORT);
-                    new_new_packet.setData(encodePacketData(i, messagesSent.get(i)));
-                    socket.send(new_new_packet);
-                    System.out.println("--->" +messagesSent.get(i));
-                    while (true) {
-                        byte[] new_buffer = new byte[PACKET_SIZE];
-                        DatagramPacket new_packet = new DatagramPacket(new_buffer, new_buffer.length);
-                        socket.receive(new_packet);
-                        message = new String(new_packet.getData()).trim().split("--");
-                        if (message[0].equals("ACK") && Integer.parseInt(message[1]) == nDownloader) {
-                            break;
+            if(!message[0].equals("ACK")) {
+                if (Integer.parseInt(message[0]) == -1 && Integer.parseInt(message[3]) == nDownloader) {
+                    System.out.println("RECEBI UM NACK");
+                    int limit = Integer.parseInt(message[2]);
+                    for (int i = Integer.parseInt(message[1]); i <= limit; i++) {
+                        byte[] data = "NACK".getBytes();
+                        DatagramPacket new_new_packet = new DatagramPacket(data, data.length, group, PORT);
+                        new_new_packet.setData(encodePacketData(i, messagesSent.get(i)));
+                        socket.send(new_new_packet);
+                        System.out.println("--->" + messagesSent.get(i));
+                        while (true) {
+                            byte[] new_buffer = new byte[PACKET_SIZE];
+                            DatagramPacket new_packet = new DatagramPacket(new_buffer, new_buffer.length);
+                            socket.receive(new_packet);
+                            message = new String(new_packet.getData()).trim().split("--");
+                            if (message[0].equals("ACK") && Integer.parseInt(message[1]) == nDownloader) {
+                                break;
+                            }
                         }
                     }
                 }
@@ -93,32 +96,4 @@ public class ReliableMulticastServer extends Thread implements Runnable {
             throw new RuntimeException(e);
         }
     }
-/*
-    private void waitForAck(byte[] message) throws IOException, InterruptedException {
-        HashSet<Integer> ackSet = new HashSet<>();
-        boolean receivedAcks = false;
-        long timeout = 1000;
-        while(!receivedAcks){
-            byte[] buffer = new byte[1024];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            System.out.println("oi");
-            socket.receive(packet);
-            System.out.println("ola");
-            String receivedMessage = new String(packet.getData()).trim();
-            if(receivedMessage.equals("ACK")){
-                System.out.println("recebi");
-                ackSet.add(packet.getPort());
-                if (ackSet.size() == 1) { //mudar quando tivermos mais barrels
-                    receivedAcks = true;
-                }
-            }
-            if(!receivedAcks){
-                socket.send(new DatagramPacket(message, message.length, groupAddress, groupPort));
-                // wait for the remaining timeout
-                Thread.sleep(timeout);
-            }
-        }
-    }
-*/
-
 }
