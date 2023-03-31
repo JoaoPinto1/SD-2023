@@ -20,6 +20,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.StringTokenizer;
 
+/**
+ * Classe Downloader
+ */
 public class Downloader extends Thread implements Serializable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
@@ -29,7 +32,10 @@ public class Downloader extends Thread implements Serializable {
     private static Downloader_RMI drmi;
     private ReliableMulticastServer multicast;
 
-
+    /**
+     * Construtor da Classe Downloader para o processamento de páginas Web e envio multicast para Barrels
+     * @param n Identificador do Downloader
+     */
     public Downloader(int n){
         nDownloader = n;
         multicast = new ReliableMulticastServer(nDownloader);
@@ -37,6 +43,11 @@ public class Downloader extends Thread implements Serializable {
         t1.start();
     }
 
+    /**
+     * Método main da Class Downloader
+     * @param args Identificador do Downloader
+     * @throws Exception Exceções encontradas
+     */
     public static void main(String[] args) throws Exception{
         Downloader server = new Downloader(Integer.parseInt(args[0]));
 

@@ -7,6 +7,9 @@ import java.util.*;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * Classe onde se encontra todos os métodos para a implementação do multicast da parte dos Downloaders
+ */
 public class ReliableMulticastServer extends Thread implements Runnable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
@@ -18,7 +21,12 @@ public class ReliableMulticastServer extends Thread implements Runnable {
     private List<String> messagesSent;
     private int nDownloader;
 
-
+    /**
+     * Construtor da Classe de Multicast utilizado pelos Downloaders.
+     * Cria um servidor de multicast confiável que usa NACK com retransmissão de pacotes perdidos para garantir a entrega confiável
+     *
+     * @param n Identificador do Downloader
+     */
     public ReliableMulticastServer(int n) {
         try {
             socket = new MulticastSocket(PORT);
@@ -34,6 +42,11 @@ public class ReliableMulticastServer extends Thread implements Runnable {
         }
     }
 
+    /**
+     * Método de envio de mensagens multicast para os Barrels
+     * @param message Mensagem a ser enviada
+     * @throws IOException Se ocorrer um erro de IO ao enviar a mensagem
+     */
     public void send(String message) throws IOException {
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, group, PORT);
@@ -49,16 +62,22 @@ public class ReliableMulticastServer extends Thread implements Runnable {
         }
     }
 
+    /**
+     * Método utilizado na Thread em modo de escuta para o caso de receção de NACKs, retransmite os pacotes perdidos pelo
+     * Barrel em questão e espera a receção dos ACKs desses mesmos pacotes
+     * @throws IOException Se ocorrer um erro de IO ao receber os pacotes
+     * @throws InterruptedException Se a thread for interrompida enquanto estiver a aguardar a recepção de pacotes
+     */
     private void receiveACKorNACK() throws IOException, InterruptedException {
         String[] message;
         while (true) {
-            System.out.println("tou a espera");
             byte[] buffer = new byte[PACKET_SIZE];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             socket.receive(packet);
             message = new String(packet.getData()).trim().split("--");
-            System.out.println(message[0] + message[1]);
+            //ignora ACKs
             if(!message[0].equals("ACK")) {
+                //ter a certeza se é para este Downloader utilizando nDownloader
                 if (Integer.parseInt(message[0]) == -1 && Integer.parseInt(message[3]) == nDownloader) {
                     System.out.println("RECEBI UM NACK");
                     int limit = Integer.parseInt(message[2]);
@@ -67,10 +86,12 @@ public class ReliableMulticastServer extends Thread implements Runnable {
                         DatagramPacket new_new_packet = new DatagramPacket(data, data.length, group, PORT);
                         new_new_packet.setData(encodePacketData(i, messagesSent.get(i)));
                         socket.send(new_new_packet);
+                        //envia pacotes perdidos
                         System.out.println("--->" + messagesSent.get(i));
                         while (true) {
                             byte[] new_buffer = new byte[PACKET_SIZE];
                             DatagramPacket new_packet = new DatagramPacket(new_buffer, new_buffer.length);
+                            //aguarda receção de ACKS
                             socket.receive(new_packet);
                             message = new String(new_packet.getData()).trim().split("--");
                             if (message[0].equals("ACK") && Integer.parseInt(message[1]) == nDownloader) {
@@ -84,6 +105,13 @@ public class ReliableMulticastServer extends Thread implements Runnable {
     }
 
 
+    /**
+     * Responsável por codificar o número de sequência da mensagem e o próprio conteúdo da mensagem em um array de bytes,
+     *  para que possa ser enviado como um pacote de dados.
+     * @param sequenceNumber Numero de sequência do pacote
+     * @param message Mensagem a enviar
+     * @return Mensagem codificada em byte[] pronta a enviar
+     */
     private byte[] encodePacketData(int sequenceNumber, String message) {
         return (sequenceNumber + "--" + nDownloader + "--" + message).getBytes();
     }
