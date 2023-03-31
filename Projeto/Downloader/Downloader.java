@@ -1,12 +1,7 @@
 package Downloader;
 
-import RMIClient.Hello_C_I;
-import RMIClient.Hello_S_I;
-import RMISearchModule.pagina_adminstracao;
 import URLQueue.URLObject;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,7 +11,6 @@ import URLQueue.QueueInterface;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.StringTokenizer;
 

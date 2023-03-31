@@ -1,6 +1,5 @@
 package RMISearchModule;
 
-import Downloader.Downloader;
 import RMIClient.Hello_C_I;
 
 import java.rmi.server.*;

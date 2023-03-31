@@ -160,14 +160,14 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
     }
 
     /**
-     * usado para verificar se o cliente esta ativo ou nao. Devolve exececao se nao estiver ativo
+     * Usado para verificar se o cliente esta ativo ou nao. Devolve exececao se nao estiver ativo
      */
     public void ping(){
 
     }
 
     /**
-     * Le inteiro inserido na consola
+     * Lê inteiro inserido na consola
      */
     private static int read_int() {
 
