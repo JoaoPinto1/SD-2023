@@ -78,8 +78,10 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                         if (escolha != 1) {
                             break;
-                        } else
+                        } else {
+                            System.out.println("««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««");
                             counter = 0;
+                        }
                     }
                 }
 
@@ -108,8 +110,10 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
 
                         if (escolha != 1) {
                             break;
-                        } else
+                        } else {
+                            System.out.println("«««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««");
                             counter = 0;
+                        }
                     }
                 }
 
