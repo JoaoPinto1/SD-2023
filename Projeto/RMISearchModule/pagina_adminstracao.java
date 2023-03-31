@@ -6,6 +6,9 @@ import RMIClient.Hello_C_I;
 import java.rmi.RemoteException;
 import java.util.*;
 
+/**
+ * Classe Pagina de administracao
+ */
 public class pagina_adminstracao implements Runnable {
 
     public final List<String> searchs;
@@ -15,7 +18,7 @@ public class pagina_adminstracao implements Runnable {
     public Map<String, String> top_searchs;
 
     /**
-     *
+     * Contrutor da classe pagina_administracao onde ira ser apresentado todas as informacoes do sistema
      * @param searchs pesquisas realizadas
      * @param storage_barrels lista de storage barrels
      * @param tsearchs 10 pesquisas mais realizadas

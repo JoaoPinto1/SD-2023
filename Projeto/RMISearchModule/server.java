@@ -15,6 +15,9 @@ import RMIClient.Hello_S_I;
 import URLQueue.*;
 
 
+/**
+ * Classe do Server
+ */
 public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, Serializable {
 
     private Thread t0;

@@ -9,13 +9,25 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * Classe Downloader_RMI
+ */
 public class Downloader_RMI extends UnicastRemoteObject implements Runnable, Hello_C_I {
 
+    /**
+     * Contrutor Downloader_RMI
+     * @throws RemoteException Erro RMI
+     */
         protected Downloader_RMI() throws RemoteException {
             super();
         }
 
-        public void print_on_client(String s) throws RemoteException {
+    /**
+     * Servidor fornece string ao cliente
+     * @param s String a enviar
+     * @throws RemoteException
+     */
+    public void print_on_client(String s) throws RemoteException {
 
         }
 
