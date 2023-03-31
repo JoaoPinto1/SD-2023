@@ -5,7 +5,9 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class ReliableMulticastServer {
+import static java.lang.Thread.sleep;
+
+public class ReliableMulticastServer extends Thread implements Runnable {
     private final String MULTICAST_ADDRESS = "224.3.2.1";
     private final int PORT = 4321;
     private static final int PACKET_SIZE = 5000;
@@ -17,7 +19,7 @@ public class ReliableMulticastServer {
     private int nDownloader;
 
 
-    public ReliableMulticastServer(int n) throws IOException {
+    public ReliableMulticastServer(int n) {
         try {
             socket = new MulticastSocket(PORT);
             group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -42,34 +44,54 @@ public class ReliableMulticastServer {
                 messagesSent.add(message);
                 sequenceNumber++;
             }
-            receiveACKorNACK();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void receiveACKorNACK() throws IOException {
-        byte[] buffer = new byte[PACKET_SIZE];
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        socket.receive(packet);
-        String[] message = new String(packet.getData()).trim().split("--");
-        if (message[0].equals("ACK")) {
-            if (Integer.parseInt(message[1]) == nDownloader) {
-                //System.out.println("RECEBIDO ACK");
-            } else {
-                receiveACKorNACK();
-            }
-        } else if (Integer.parseInt(message[0]) == -1) {
-            if (Integer.parseInt(message[2]) == nDownloader) {
+    private void receiveACKorNACK() throws IOException, InterruptedException {
+        String[] message;
+        while (true) {
+            System.out.println("tou a espera");
+            byte[] buffer = new byte[PACKET_SIZE];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            socket.receive(packet);
+            message = new String(packet.getData()).trim().split("--");
+            System.out.println(message[0] + message[1]);
+            if (Integer.parseInt(message[0]) == -1 && Integer.parseInt(message[3]) == nDownloader) {
                 System.out.println("RECEBI UM NACK");
-                send(messagesSent.get(Integer.parseInt(message[1])));
+                for (int i = Integer.parseInt(message[1]); i <= Integer.parseInt(message[2]); i++) {
+                    byte[] data = "NACK".getBytes();
+                    DatagramPacket new_new_packet = new DatagramPacket(data, data.length, group, PORT);
+                    new_new_packet.setData(encodePacketData(i, messagesSent.get(i)));
+                    socket.send(new_new_packet);
+                    System.out.println("--->" +messagesSent.get(i));
+                    while (true) {
+                        byte[] new_buffer = new byte[PACKET_SIZE];
+                        DatagramPacket new_packet = new DatagramPacket(new_buffer, new_buffer.length);
+                        socket.receive(new_packet);
+                        message = new String(new_packet.getData()).trim().split("--");
+                        if (message[0].equals("ACK") && Integer.parseInt(message[1]) == nDownloader) {
+                            break;
+                        }
+                    }
+                }
             }
-
         }
     }
 
+
     private byte[] encodePacketData(int sequenceNumber, String message) {
         return (sequenceNumber + "--" + nDownloader + "--" + message).getBytes();
+    }
+
+    @Override
+    public void run() {
+        try {
+            receiveACKorNACK();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 /*
     private void waitForAck(byte[] message) throws IOException, InterruptedException {

@@ -23,23 +23,16 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
 
     @Override
     public void run() {
-        try (MulticastSocket socket = new MulticastSocket(PORT)) {
-            InetSocketAddress group = new InetSocketAddress(MULTICAST_ADDRESS, PORT);
-            NetworkInterface netIf = NetworkInterface.getByName("bge0");
-            socket.joinGroup(group, netIf);
+        try {
             ReliableMulticastClient multicast = new ReliableMulticastClient();
             while (true) {
                 System.out.println("Waiting");
-                byte[] buffer = new byte[5000];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                socket.receive(packet);
+                DatagramPacket packet = multicast.receive();
                 String[] message = new String(packet.getData()).trim().split("--");
                 if (!message[0].equals("ACK")){
                     if(Integer.parseInt(message[0])!=-1) {
                         int nDownloader = multicast.decodeDownloaderNumber(packet.getData());
                         int num = multicast.checkPacket(packet, nDownloader);
-                        if (num == 0)
-                            continue;
                     }
                 }
             }

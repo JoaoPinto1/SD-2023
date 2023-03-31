@@ -1,6 +1,8 @@
 package StorageBarrel;
+import java.io.IOException;
 import java.rmi.server.*;
 import java.rmi.*;
+import java.sql.SQLException;
 
 
 public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barrels_Remote {
@@ -13,7 +15,7 @@ public class Storage_Barrels extends UnicastRemoteObject implements Storage_Barr
      * Inicia os dois RMISearchModule.server necessarios, o que espera do search module e o dos barrels.
      * @throws RemoteException
      */
-    public Storage_Barrels() throws RemoteException{
+    public Storage_Barrels() throws IOException, SQLException {
 
         super();
         sMUL = new Storage_Barrels_Multicast();

@@ -25,11 +25,16 @@ public class Downloader extends Thread implements Serializable {
     private final int PORT = 4321;
     private static final int PACKET_SIZE = 5000;
     private int nDownloader;
-    private static Thread t0;
+    private static Thread t0,t1;
     private static Downloader_RMI drmi;
+    private ReliableMulticastServer multicast;
+
 
     public Downloader(int n){
         nDownloader = n;
+        multicast = new ReliableMulticastServer(nDownloader);
+        t1 = new Thread(multicast);
+        t1.start();
     }
 
     public static void main(String[] args) throws Exception{
@@ -44,10 +49,9 @@ public class Downloader extends Thread implements Serializable {
 
     public void run() {
         try {
-            ReliableMulticastServer multicast = new ReliableMulticastServer(nDownloader);
+
             // create socket without binding it (only for sending)
             QueueInterface server = (QueueInterface) LocateRegistry.getRegistry(6000).lookup("Queue");
-            int seqNum = 0;
             while (true) {
                 try {
                     URLObject url = server.removeFromQueue();
