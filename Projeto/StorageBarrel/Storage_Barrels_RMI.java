@@ -28,17 +28,12 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
     public void print_on_client(String s) throws RemoteException {
 
         //tipo de search
-        System.out.println(("aaaaa"));
         String[] pesquisa = s.split(",");
         System.out.println(Arrays.toString(pesquisa));
         //todos os URLS em que aparece o primeiro termo.
         ArrayList<String> rowValuesFinal = new ArrayList<String>();
         ArrayList<String> resultList = new ArrayList<String>();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         if (pesquisa[0].equals("search;")) {
             try {
                 String db = "jdbc:postgresql://localhost:5432/db"+nBarrel;

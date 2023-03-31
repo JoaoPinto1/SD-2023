@@ -31,7 +31,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
 
     /**
-     * 
+     *
      * @param Result resultado obtidos nas pesquisas
      * @param Searchs pesquisas realizadas
      * @param tsearchs 10 pesquisas mais realizadas
@@ -108,6 +108,7 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
                 synchronized (results) {
 
                     while (results.isEmpty()) {
+
                         results.notify();
                         System.out.println("o que vou mandar:" + s);
                         results.add(s);
@@ -117,6 +118,11 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
 
                     String resultados = results.get(0);
                     results.remove(0);
+                    System.out.println(results);
+
+                    synchronized (searchs){
+                        searchs.notifyAll();
+                    }
 
                     try {
                         c.print_on_client("type | status; search | result; " + resultados);
@@ -136,14 +142,18 @@ public class server extends UnicastRemoteObject implements Hello_S_I, Runnable, 
                 synchronized (results) {
 
                     while (results.isEmpty()) {
-                        results.notify();
-                        System.out.println("o que vou mandar:" + s);
+                        //System.out.println("o que vou mandar:" + s);
                         results.add(s);
+                        results.notify();
                         results.wait();
 
                     }
                     String resultados = results.get(0);
                     results.remove(0);
+
+                    synchronized (searchs){
+                        searchs.notifyAll();
+                    }
 
                     try {
                         c.print_on_client("type | status; search1 | result; " + resultados);

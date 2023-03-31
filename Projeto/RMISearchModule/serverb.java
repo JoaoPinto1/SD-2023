@@ -150,6 +150,7 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
 
         while (true) {
             retry = 0;
+
             synchronized (results) {
                 while (results.isEmpty()) {
                     try {
@@ -161,84 +162,124 @@ public class serverb extends UnicastRemoteObject implements Hello_S_I, Hello_C_I
                 }
             }
 
+            //System.out.println("a lista no momento:" + results);
+            String str_received = results.get(0);
+            results.remove(0);
+
+            String[] str = str_received.split(" ");
+            String new_string = str[2] + "," + str[5];
+
             Hello_C_I client = RandomClient();
 
             while (client == null) {
                 try {
+
+                    if (retry == 20) {
+                        System.out.println("Conexao com o barrel falhou.");
+
+                        synchronized (results) {
+                            results.add("nada");
+                            results.notify();
+                        }
+
+                        synchronized (searchs){
+                            searchs.wait();
+                        }
+
+                        break;
+                    }
+
                     System.out.println("looking for new barrel!");
                     Thread.sleep(500);
+                    retry++;
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
                 client = RandomClient();
             }
 
-            try {
+            synchronized (searchs) {
+                searchs.add(str[5]);
+            }
 
-                System.out.println("a lista no momento:" + results);
-                String str_received = results.get(0);
-                results.remove(0);
+            if (client != null) {
+                try {
+                    int connect = 0;
 
-                String[] str = str_received.split(" ");
-                String new_string = str[2] + "," + str[5];
+                    while (connect == 0) {
+                        try {
+                            client.ping();
 
-                int connect = 0;
-
-                while (connect == 0) {
-
-                    try {
-                        client.print_on_client(new_string);
-
-                        synchronized (searchs){
-                            searchs.add(str[5]);
-                        }
-
-                        synchronized (clients_RMI){
-                            clients_RMI.notifyAll();
-                        }
-
-                        connect = 1;
-                    } catch (ConnectException e) {
-
-                        System.out.println("Storage Barrel Invalido!");
-                        h.unsubscribe("Storage Barrel", client);
-
-                        synchronized (clients_RMI){
-                            clients_RMI.notifyAll();
-                        }
-
-                        System.out.println("looking for new barrel!");
-
-                        client = RandomClient();
-
-                        while (client == null) {
-                            retry++;
-                            if(retry == 20){
-                                results.add("nada");
-                                results.notify();
-                                break;
-                            }
                             try {
-                                System.out.println("looking for new barrel ...");
-                                Thread.sleep(1000);
-                            } catch (InterruptedException ex) {
-                                throw new RuntimeException(ex);
+                                client.print_on_client(new_string);
+
+                                synchronized (clients_RMI) {
+                                    clients_RMI.notifyAll();
+                                }
+
+                            }catch(RemoteException e){
+                                System.out.println("Storage Barrel disconetou a meio da pesquisa.");
+
+                                synchronized (results) {
+                                    results.add("nada");
+                                    results.notify();
+                                }
+
+                                synchronized (searchs){
+                                    searchs.wait();
+                                }
                             }
+
+                            connect = 1;
+                        } catch (RemoteException e) {
+
+                            System.out.println("Storage Barrel Invalido!");
+                            h.unsubscribe("Storage Barrel", client);
+
+                            synchronized (clients_RMI) {
+                                clients_RMI.notifyAll();
+                            }
+
+                            System.out.println("looking for new barrel!");
+
                             client = RandomClient();
 
+                            while (client == null) {
+                                retry++;
+                                if (retry == 20) {
+                                    System.out.println("Nao foi possivel conectar com o barrel");
+
+                                    synchronized (results) {
+                                        results.add("nada");
+                                        results.notify();
+                                    }
+
+                                    synchronized (searchs){
+                                        searchs.wait();
+                                    }
+
+                                    break;
+                                }
+                                try {
+                                    System.out.println("looking for new barrel ...");
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                                client = RandomClient();
+
+                            }
+
+                            if (retry == 20)
+                                break;
                         }
 
-                        if(retry == 20){
-                            break;
-                        }
                     }
 
+                } catch (RemoteException | InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
             }
         }
-
     }
 }
