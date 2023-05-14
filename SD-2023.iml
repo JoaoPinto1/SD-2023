@@ -10,7 +10,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../jsoup-1.15.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../entrega/jars/jsoup-1.15.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +19,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../postgresql-42.6.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../entrega/jars/postgresql-42.6.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

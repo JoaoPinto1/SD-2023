@@ -37,9 +37,7 @@ public class Storage_Barrels_Multicast extends Thread implements Runnable {
                 }
             }
         } catch (IOException | SQLException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
