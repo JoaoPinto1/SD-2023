@@ -128,7 +128,7 @@ public class Storage_Barrels_RMI extends UnicastRemoteObject implements Hello_C_
 
         } else {
             try {
-                Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/googol", "test", "test");
+                Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/db" + nBarrel, "test", "test");
                 con.setAutoCommit(false);
                 PreparedStatement pre_stmt;
                 ResultSet rs;

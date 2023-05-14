@@ -234,7 +234,6 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
             Interface c = new Interface();
             h.subscribe("cliente", (Hello_C_I) c);
 
-
             while (true) {
 
                 System.out.println("O que deseja realizar?\n\n1 - Login\n2 - Registar\n3 - Logout\n4 - Indexar novo URL\n5 - Realizar pesquisa de termos\n6 - Realizar pesquisa de urls\n7 - Consultar informacoes gerais do sistema\n8 - Sair do programa\n");
@@ -290,7 +289,6 @@ public class Interface extends UnicastRemoteObject implements Hello_C_I {
                                             }
                                         }
                                     }
-
                                 }
                             }
                             break;
